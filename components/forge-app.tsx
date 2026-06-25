@@ -6,6 +6,7 @@ import { MindDumpScreen } from "@/components/screens/minddump"
 import { BlueprintScreen } from "@/components/screens/blueprint"
 import { TodayScreen } from "@/components/screens/today"
 import { ReflectionScreen } from "@/components/screens/reflection"
+import { MetricsScreen } from "@/components/screens/metrics"
 
 export function ForgeApp() {
   const { onboardingComplete, currentScreen } = useForgeStore()
@@ -21,6 +22,7 @@ export function ForgeApp() {
         {currentScreen === "blueprint" && <BlueprintScreen />}
         {currentScreen === "today" && <TodayScreen />}
         {currentScreen === "reflection" && <ReflectionScreen />}
+        {currentScreen === "metrics" && <MetricsScreen />}
         {currentScreen === "minddump" && <MindDumpScreen />}
       </main>
     </div>

@@ -3,7 +3,7 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-export type Screen = "minddump" | "blueprint" | "today" | "reflection"
+export type Screen = "minddump" | "blueprint" | "today" | "reflection" | "metrics"
 
 export interface Task {
   id: string

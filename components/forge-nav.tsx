@@ -4,10 +4,11 @@ import { useForgeStore, type Screen } from "@/lib/forge-store"
 import { cn } from "@/lib/utils"
 
 const navItems: { id: Screen; label: string }[] = [
-  { id: "minddump", label: "Mind Dump" },
+  { id: "minddump", label: "Dump" },
   { id: "blueprint", label: "Blueprint" },
   { id: "today", label: "Today" },
-  { id: "reflection", label: "Reflection" },
+  { id: "reflection", label: "Reflect" },
+  { id: "metrics", label: "Metrics" },
 ]
 
 export function ForgeNav() {
