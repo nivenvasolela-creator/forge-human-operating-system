@@ -3,17 +3,13 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-export type Screen =
-  | "onboarding"
-  | "identity"
-  | "blueprint"
-  | "command"
-  | "deepwork"
-  | "scoreboard"
-  | "mirror"
-  | "compounder"
-  | "review"
-  | "recovery"
+export type Screen = "minddump" | "blueprint" | "today" | "reflection"
+
+export interface Task {
+  id: string
+  text: string
+  done: boolean
+}
 
 export interface Milestone {
   id: string
@@ -22,86 +18,68 @@ export interface Milestone {
   done: boolean
 }
 
-export interface Task {
+export interface ReflectionEntry {
   id: string
-  text: string
-  done: boolean
-  priority: "high" | "medium" | "low"
-}
-
-export interface DeepWorkSession {
-  id: string
-  label: string
-  minutes: number
   date: string
-}
-
-export interface ScoreEntry {
-  category: string
-  score: number
-  maxScore: number
-  icon: string
-}
-
-export interface CompoundEntry {
-  label: string
-  value: number
-  unit: string
-  icon: string
+  did: string
+  blocked: string
+  tomorrow: string
 }
 
 export interface ForgeState {
-  // Onboarding
+  // Onboarding / identity
   onboardingComplete: boolean
   userName: string
-  mindDump: string
-  onboardingAnswers: Record<string, string>
 
-  // Identity
-  futureIdentity: string[]
-  currentIdentity: string[]
-  coreValues: string[]
+  // Mind Dump
+  mindDump: string
 
   // Blueprint
-  tenYearVision: string
+  destination: string       // who you want to become
+  currentReality: string    // where you are now
+  gap: string               // what must change
   milestones: Milestone[]
 
-  // Command Center
-  dailyMission: string
-  tasks: Task[]
+  // Today
+  tasks: Task[]             // max 3
+  deepWorkMinutes: number
+  deepWorkGoal: number      // minutes per day goal
 
-  // Deep Work
-  sessions: DeepWorkSession[]
-  activeSession: { label: string; startTime: number; running: boolean } | null
+  // Reflection history
+  reflections: ReflectionEntry[]
 
-  // Scores
-  scores: ScoreEntry[]
-
-  // Compounder
-  compounds: CompoundEntry[]
+  // Metrics (derived, minimal)
+  streakDays: number
+  totalDeepWorkHours: number
+  completedToday: number
 
   // Navigation
   currentScreen: Screen
 
   // Actions
   setScreen: (screen: Screen) => void
-  setOnboardingComplete: (name: string, dump: string, answers: Record<string, string>) => void
-  setFutureIdentity: (items: string[]) => void
-  setCurrentIdentity: (items: string[]) => void
-  setCoreValues: (items: string[]) => void
-  setTenYearVision: (v: string) => void
-  setMilestones: (m: Milestone[]) => void
+  completeMindDump: (name: string, dump: string) => void
+  setMindDump: (dump: string) => void
+  setBlueprint: (destination: string, currentReality: string, gap: string) => void
+  setMilestones: (milestones: Milestone[]) => void
   toggleMilestone: (id: string) => void
-  setDailyMission: (m: string) => void
-  addTask: (text: string, priority?: Task["priority"]) => void
+  setTasks: (tasks: Task[]) => void
+  addTask: (text: string) => void
   toggleTask: (id: string) => void
   removeTask: (id: string) => void
-  startSession: (label: string) => void
-  stopSession: () => void
-  updateScore: (category: string, score: number) => void
-  incrementCompound: (label: string, amount?: number) => void
-  resetToRecovery: () => void
+  logDeepWork: (minutes: number) => void
+  setDeepWorkGoal: (minutes: number) => void
+  addReflection: (entry: Omit<ReflectionEntry, "id" | "date">) => void
+  resetOnboarding: () => void
 }
+
+const defaultMilestones: Milestone[] = [
+  { id: "1", label: "Identify the one skill that unlocks everything", timeframe: "30 days", done: false },
+  { id: "2", label: "Ship a real project to a real audience", timeframe: "90 days", done: false },
+  { id: "3", label: "Generate first income from your craft", timeframe: "6 months", done: false },
+  { id: "4", label: "Go full-time on your vision", timeframe: "2 years", done: false },
+  { id: "5", label: "Reach the top 1% in your field", timeframe: "5 years", done: false },
+]
 
 export const useForgeStore = create<ForgeState>()(
   persist(
@@ -109,56 +87,36 @@ export const useForgeStore = create<ForgeState>()(
       onboardingComplete: false,
       userName: "",
       mindDump: "",
-      onboardingAnswers: {},
-      futureIdentity: ["AI Builder", "Entrepreneur", "Investor", "Leader"],
-      currentIdentity: ["Student", "Ambitious", "Inconsistent"],
-      coreValues: ["Discipline", "Growth", "Excellence", "Freedom"],
-      tenYearVision: "",
-      milestones: [
-        { id: "1", label: "Master core skill stack", timeframe: "90 days", done: false },
-        { id: "2", label: "Launch first project", timeframe: "6 months", done: false },
-        { id: "3", label: "First $1K revenue", timeframe: "1 year", done: false },
-        { id: "4", label: "Full-time on your craft", timeframe: "3 years", done: false },
-        { id: "5", label: "Top 1% in your field", timeframe: "5 years", done: false },
-        { id: "6", label: "Build your empire", timeframe: "10 years", done: false },
-      ],
-      dailyMission: "",
+      destination: "",
+      currentReality: "",
+      gap: "",
+      milestones: defaultMilestones,
       tasks: [],
-      sessions: [],
-      activeSession: null,
-      scores: [
-        { category: "Learning", score: 0, maxScore: 10, icon: "BookOpen" },
-        { category: "Health", score: 0, maxScore: 10, icon: "Heart" },
-        { category: "Discipline", score: 0, maxScore: 10, icon: "Shield" },
-        { category: "Skills", score: 0, maxScore: 10, icon: "Zap" },
-        { category: "Relationships", score: 0, maxScore: 10, icon: "Users" },
-        { category: "Finances", score: 0, maxScore: 10, icon: "TrendingUp" },
-      ],
-      compounds: [
-        { label: "Deep Work Hours", value: 0, unit: "hrs", icon: "Timer" },
-        { label: "Books Read", value: 0, unit: "books", icon: "BookOpen" },
-        { label: "Projects Built", value: 0, unit: "built", icon: "Cpu" },
-        { label: "Days Disciplined", value: 0, unit: "days", icon: "Flame" },
-        { label: "Skills Acquired", value: 0, unit: "skills", icon: "Zap" },
-      ],
-      currentScreen: "onboarding",
+      deepWorkMinutes: 0,
+      deepWorkGoal: 240,
+      reflections: [],
+      streakDays: 0,
+      totalDeepWorkHours: 0,
+      completedToday: 0,
+      currentScreen: "minddump",
 
       setScreen: (screen) => set({ currentScreen: screen }),
 
-      setOnboardingComplete: (name, dump, answers) =>
+      completeMindDump: (name, dump) =>
         set({
           onboardingComplete: true,
           userName: name,
           mindDump: dump,
-          onboardingAnswers: answers,
-          currentScreen: "identity",
+          currentScreen: "blueprint",
         }),
 
-      setFutureIdentity: (items) => set({ futureIdentity: items }),
-      setCurrentIdentity: (items) => set({ currentIdentity: items }),
-      setCoreValues: (items) => set({ coreValues: items }),
-      setTenYearVision: (v) => set({ tenYearVision: v }),
-      setMilestones: (m) => set({ milestones: m }),
+      setMindDump: (dump) => set({ mindDump: dump }),
+
+      setBlueprint: (destination, currentReality, gap) =>
+        set({ destination, currentReality, gap }),
+
+      setMilestones: (milestones) => set({ milestones }),
+
       toggleMilestone: (id) =>
         set((s) => ({
           milestones: s.milestones.map((m) =>
@@ -166,64 +124,74 @@ export const useForgeStore = create<ForgeState>()(
           ),
         })),
 
-      setDailyMission: (m) => set({ dailyMission: m }),
-      addTask: (text, priority = "medium") =>
-        set((s) => ({
-          tasks: [
-            ...s.tasks,
-            { id: Date.now().toString(), text, done: false, priority },
-          ],
-        })),
-      toggleTask: (id) =>
-        set((s) => ({
-          tasks: s.tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
-        })),
-      removeTask: (id) =>
-        set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) })),
+      setTasks: (tasks) => set({ tasks }),
 
-      startSession: (label) =>
-        set({ activeSession: { label, startTime: Date.now(), running: true } }),
-      stopSession: () => {
-        const { activeSession, sessions } = get()
-        if (!activeSession) return
-        const minutes = Math.round((Date.now() - activeSession.startTime) / 60000)
+      addTask: (text) => {
+        const { tasks } = get()
+        if (tasks.filter((t) => !t.done).length >= 3) return
         set({
-          activeSession: null,
-          sessions: [
-            ...sessions,
-            {
-              id: Date.now().toString(),
-              label: activeSession.label,
-              minutes: Math.max(1, minutes),
-              date: new Date().toLocaleDateString(),
-            },
+          tasks: [
+            ...tasks,
+            { id: Date.now().toString(), text, done: false },
           ],
-          compounds: get().compounds.map((c) =>
-            c.label === "Deep Work Hours"
-              ? { ...c, value: +(c.value + minutes / 60).toFixed(1) }
-              : c
-          ),
         })
       },
 
-      updateScore: (category, score) =>
-        set((s) => ({
-          scores: s.scores.map((sc) =>
-            sc.category === category ? { ...sc, score } : sc
-          ),
-        })),
+      toggleTask: (id) =>
+        set((s) => {
+          const updated = s.tasks.map((t) =>
+            t.id === id ? { ...t, done: !t.done } : t
+          )
+          const completedToday = updated.filter((t) => t.done).length
+          return { tasks: updated, completedToday }
+        }),
 
-      incrementCompound: (label, amount = 1) =>
-        set((s) => ({
-          compounds: s.compounds.map((c) =>
-            c.label === label ? { ...c, value: +(c.value + amount).toFixed(1) } : c
-          ),
-        })),
+      removeTask: (id) =>
+        set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) })),
 
-      resetToRecovery: () => set({ currentScreen: "recovery" }),
+      logDeepWork: (minutes) =>
+        set((s) => {
+          const total = s.totalDeepWorkHours + minutes / 60
+          return {
+            deepWorkMinutes: s.deepWorkMinutes + minutes,
+            totalDeepWorkHours: parseFloat(total.toFixed(1)),
+          }
+        }),
+
+      setDeepWorkGoal: (minutes) => set({ deepWorkGoal: minutes }),
+
+      addReflection: (entry) =>
+        set((s) => {
+          const newEntry: ReflectionEntry = {
+            id: Date.now().toString(),
+            date: new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+            ...entry,
+          }
+          // Increment streak
+          const streak = s.streakDays + 1
+          // Reset tasks for tomorrow
+          return {
+            reflections: [newEntry, ...s.reflections],
+            streakDays: streak,
+            tasks: s.tasks.map((t) => ({ ...t, done: false })),
+            deepWorkMinutes: 0,
+            completedToday: 0,
+            currentScreen: "today" as Screen,
+          }
+        }),
+
+      resetOnboarding: () =>
+        set({
+          onboardingComplete: false,
+          currentScreen: "minddump",
+          userName: "",
+          mindDump: "",
+        }),
     }),
-    {
-      name: "forge-os-v1",
-    }
+    { name: "alera-v1" }
   )
 )

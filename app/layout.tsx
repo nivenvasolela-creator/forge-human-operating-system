@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'FORGE — Human Operating System',
-  description: 'Turn your life into a relentless system. FORGE converts your dreams into identity, strategy, and daily execution — propelling you to the top 1%.',
+  title: 'Alera — Convert dreams into a system',
+  description: 'Dump your mind. Get a blueprint. Know what matters today. Reflect tonight. The simplest system for becoming who you want to be.',
   generator: 'v0.app',
 }
 

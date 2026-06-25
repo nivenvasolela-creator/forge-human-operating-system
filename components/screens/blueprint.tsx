@@ -2,233 +2,247 @@
 
 import { useState } from "react"
 import { useForgeStore } from "@/lib/forge-store"
-import { CheckCircle2, Circle, Plus, ArrowRight, Trash2 } from "lucide-react"
-import { cn } from "@/lib/utils"
-
-const TIMEFRAME_COLORS: Record<string, string> = {
-  "Today": "text-primary border-primary/40 bg-primary/10",
-  "30 days": "text-amber-400 border-amber-400/30 bg-amber-400/10",
-  "90 days": "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",
-  "6 months": "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
-  "1 year": "text-cyan-400 border-cyan-400/30 bg-cyan-400/10",
-  "3 years": "text-blue-400 border-blue-400/30 bg-blue-400/10",
-  "5 years": "text-violet-400 border-violet-400/30 bg-violet-400/10",
-  "10 years": "text-rose-400 border-rose-400/30 bg-rose-400/10",
-}
-
-const TIMEFRAMES = Object.keys(TIMEFRAME_COLORS)
 
 export function BlueprintScreen() {
   const {
-    tenYearVision,
+    mindDump,
+    destination,
+    currentReality,
+    gap,
     milestones,
-    setTenYearVision,
-    setMilestones,
+    setBlueprint,
     toggleMilestone,
     setScreen,
-    userName,
-    futureIdentity,
+    totalDeepWorkHours,
+    streakDays,
+    reflections,
   } = useForgeStore()
 
-  const [newLabel, setNewLabel] = useState("")
-  const [newTimeframe, setNewTimeframe] = useState("90 days")
-  const [editingVision, setEditingVision] = useState(!tenYearVision)
+  const [editing, setEditing] = useState(!destination)
+  const [dest, setDest] = useState(destination)
+  const [reality, setReality] = useState(currentReality)
+  const [gapText, setGapText] = useState(gap)
 
-  const addMilestone = () => {
-    if (!newLabel.trim()) return
-    setMilestones([
-      ...milestones,
-      {
-        id: Date.now().toString(),
-        label: newLabel.trim(),
-        timeframe: newTimeframe,
-        done: false,
-      },
-    ])
-    setNewLabel("")
+  const hasBlueprint = destination || currentReality || gap
+  const doneMilestones = milestones.filter((m) => m.done).length
+  const progress = milestones.length
+    ? Math.round((doneMilestones / milestones.length) * 100)
+    : 0
+
+  const save = () => {
+    setBlueprint(dest, reality, gapText)
+    setEditing(false)
   }
-
-  const removeMilestone = (id: string) => {
-    setMilestones(milestones.filter((m) => m.id !== id))
-  }
-
-  const sortedMilestones = [...milestones].sort(
-    (a, b) => TIMEFRAMES.indexOf(a.timeframe) - TIMEFRAMES.indexOf(b.timeframe)
-  )
-
-  const completedCount = milestones.filter((m) => m.done).length
-  const progress = milestones.length ? Math.round((completedCount / milestones.length) * 100) : 0
 
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="max-w-2xl mx-auto py-12 px-6 space-y-14">
+
       {/* Header */}
-      <div>
-        <p className="text-xs font-mono text-primary tracking-[0.2em] uppercase mb-2">Layer 4 — Life Blueprint</p>
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground">Your Life Roadmap</h1>
-        <p className="text-muted-foreground mt-2 leading-relaxed">
-          Dreams reverse-engineered into a timeline. Every milestone connects back to your identity.
+      <div className="space-y-1">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.2em]">Blueprint</p>
+        <h1 className="text-2xl font-semibold text-foreground">Your living roadmap</h1>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          This document updates as you grow. It is never finished.
         </p>
       </div>
 
-      {/* Progress bar */}
-      <div className="bg-[var(--surface)] border border-border rounded-sm p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">Blueprint Progress</span>
-          <span className="text-sm font-bold text-primary">{progress}%</span>
+      {/* Metrics */}
+      <div className="grid grid-cols-3 gap-px bg-border rounded-lg overflow-hidden">
+        {[
+          { label: "Streak", value: streakDays, unit: "days" },
+          { label: "Deep work", value: totalDeepWorkHours, unit: "hrs total" },
+          { label: "Reflections", value: reflections.length, unit: "logged" },
+        ].map((m) => (
+          <div key={m.label} className="bg-card px-5 py-4">
+            <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-1">{m.label}</p>
+            <p className="text-2xl font-semibold text-foreground">{m.value}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{m.unit}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Blueprint sections */}
+      {!editing && hasBlueprint ? (
+        <div className="space-y-8">
+          <Section
+            label="Destination"
+            sublabel="Who do you want to become?"
+            content={destination}
+            empty="Define who you are becoming."
+          />
+          <Section
+            label="Current reality"
+            sublabel="Where are you now?"
+            content={currentReality}
+            empty="Be honest about where you stand today."
+          />
+          <Section
+            label="The gap"
+            sublabel="What must change?"
+            content={gap}
+            empty="Name the specific things that need to change."
+          />
+          <button
+            onClick={() => {
+              setDest(destination)
+              setReality(currentReality)
+              setGapText(gap)
+              setEditing(true)
+            }}
+            className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Edit &rarr;
+          </button>
         </div>
-        <div className="h-1.5 bg-[var(--surface-raised)] rounded-full overflow-hidden">
+      ) : (
+        <div className="space-y-6">
+          {!hasBlueprint && mindDump && (
+            <div className="rounded-md border border-border bg-card/40 p-4">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                From your mind dump:
+              </p>
+              <p className="text-xs text-muted-foreground/50 italic mt-1 line-clamp-3">
+                &ldquo;{mindDump.slice(0, 200)}&hellip;&rdquo;
+              </p>
+            </div>
+          )}
+          <Field
+            label="Destination"
+            sublabel="Who do you want to become?"
+            value={dest}
+            onChange={setDest}
+            placeholder="In 5 years I am a founder who has built a product used by 1M people, earns well, and has full autonomy."
+          />
+          <Field
+            label="Current reality"
+            sublabel="Where are you now?"
+            value={reality}
+            onChange={setReality}
+            placeholder="I am 22, studying CS, building side projects but inconsistent, no revenue yet."
+          />
+          <Field
+            label="The gap"
+            sublabel="What must change?"
+            value={gapText}
+            onChange={setGapText}
+            placeholder="I need to ship weekly, learn distribution, and stop treating busyness as progress."
+          />
+          <div className="flex gap-6">
+            <button
+              onClick={save}
+              disabled={!dest.trim()}
+              className="text-sm font-mono text-primary disabled:text-muted-foreground/30 transition-colors hover:text-foreground"
+            >
+              Save &rarr;
+            </button>
+            {hasBlueprint && (
+              <button
+                onClick={() => setEditing(false)}
+                className="text-sm font-mono text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Roadmap */}
+      <div className="space-y-5">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.2em]">Roadmap</p>
+          <p className="text-xs font-mono text-muted-foreground">{doneMilestones}/{milestones.length} &nbsp;·&nbsp; {progress}%</p>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-px bg-border w-full overflow-hidden">
           <div
-            className="h-full bg-primary rounded-full transition-all duration-500"
+            className="h-full bg-primary transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-xs text-muted-foreground mt-2">
-          {completedCount} of {milestones.length} milestones complete
-        </p>
-      </div>
 
-      {/* 10-Year Vision */}
-      <div className="bg-[var(--surface)] border border-border rounded-sm p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[11px] font-mono text-primary/70 uppercase tracking-widest">10-Year Vision</p>
-            <h3 className="font-semibold text-foreground mt-1">The Destination</h3>
-          </div>
-          {!editingVision && (
+        <div className="divide-y divide-border">
+          {milestones.map((m, i) => (
             <button
-              onClick={() => setEditingVision(true)}
-              className="text-xs text-muted-foreground hover:text-primary transition-colors font-mono uppercase tracking-wide"
+              key={m.id}
+              onClick={() => toggleMilestone(m.id)}
+              className="w-full flex items-center gap-4 py-3.5 group text-left"
             >
-              Edit
-            </button>
-          )}
-        </div>
-
-        {editingVision ? (
-          <div className="space-y-3">
-            <textarea
-              value={tenYearVision}
-              onChange={(e) => setTenYearVision(e.target.value)}
-              placeholder={`In 10 years, ${userName || "I"} will have... I will be... I will have built... I will have earned...`}
-              className="w-full h-32 bg-[var(--surface-raised)] border border-border rounded-sm p-4 text-foreground placeholder:text-muted-foreground/50 resize-none text-sm leading-relaxed focus:outline-none focus:border-primary/50 transition-colors"
-              autoFocus
-            />
-            <button
-              onClick={() => setEditingVision(false)}
-              className="text-xs bg-primary text-primary-foreground px-4 py-2 font-bold hover:bg-primary/90 transition-all"
-            >
-              SAVE VISION
-            </button>
-          </div>
-        ) : (
-          <p className="text-foreground leading-relaxed text-sm">
-            {tenYearVision || (
-              <span className="text-muted-foreground/50 italic">
-                Click Edit to define your 10-year destination...
-              </span>
-            )}
-          </p>
-        )}
-      </div>
-
-      {/* Milestones timeline */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-foreground text-sm uppercase tracking-widest font-mono text-muted-foreground">
-          Milestone Timeline
-        </h3>
-
-        <div className="space-y-2">
-          {sortedMilestones.map((milestone) => {
-            const colorClass = TIMEFRAME_COLORS[milestone.timeframe] || "text-muted-foreground border-border bg-transparent"
-            return (
-              <div
-                key={milestone.id}
-                className={cn(
-                  "flex items-center gap-4 p-4 bg-[var(--surface)] border rounded-sm transition-all group",
-                  milestone.done ? "border-border opacity-50" : "border-border hover:border-primary/20"
-                )}
+              <span className="text-xs font-mono text-muted-foreground/30 w-4 shrink-0 select-none">{i + 1}</span>
+              <span
+                className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors ${
+                  m.done
+                    ? "bg-primary"
+                    : "bg-border group-hover:bg-muted-foreground/50"
+                }`}
+              />
+              <span
+                className={`text-sm flex-1 leading-relaxed transition-colors ${
+                  m.done ? "line-through text-muted-foreground/40" : "text-foreground"
+                }`}
               >
-                <button
-                  onClick={() => toggleMilestone(milestone.id)}
-                  className="flex-shrink-0 transition-colors"
-                  aria-label={milestone.done ? "Mark incomplete" : "Mark complete"}
-                >
-                  {milestone.done ? (
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
-                  )}
-                </button>
-                <p className={cn("flex-1 text-sm font-medium", milestone.done && "line-through text-muted-foreground")}>
-                  {milestone.label}
-                </p>
-                <span className={cn("text-[11px] font-mono px-2 py-0.5 border rounded-sm flex-shrink-0", colorClass)}>
-                  {milestone.timeframe}
-                </span>
-                <button
-                  onClick={() => removeMilestone(milestone.id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                  aria-label="Remove milestone"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Add milestone */}
-        <div className="flex gap-2">
-          <input
-            value={newLabel}
-            onChange={(e) => setNewLabel(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addMilestone()}
-            placeholder="Add a milestone..."
-            className="flex-1 bg-[var(--surface)] border border-border rounded-sm px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
-          />
-          <select
-            value={newTimeframe}
-            onChange={(e) => setNewTimeframe(e.target.value)}
-            className="bg-[var(--surface)] border border-border rounded-sm px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary/50 transition-colors"
-          >
-            {TIMEFRAMES.map((tf) => (
-              <option key={tf} value={tf}>{tf}</option>
-            ))}
-          </select>
-          <button
-            onClick={addMilestone}
-            className="px-4 py-2.5 bg-primary/20 border border-primary/30 hover:bg-primary/30 transition-colors rounded-sm"
-            aria-label="Add milestone"
-          >
-            <Plus className="w-4 h-4 text-primary" />
-          </button>
+                {m.label}
+              </span>
+              <span className="text-xs font-mono text-muted-foreground/40 shrink-0">{m.timeframe}</span>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Identity → Blueprint connection */}
-      <div className="bg-[var(--forge-muted)] border border-primary/20 rounded-sm p-5">
-        <p className="text-[11px] font-mono text-primary/70 uppercase tracking-widest mb-2">
-          Blueprint → Identity Connection
-        </p>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Every milestone you complete closes the gap between{" "}
-          <span className="text-foreground">who you are</span> and{" "}
-          <span className="text-primary">
-            {futureIdentity.slice(0, 2).join(" · ")}
-          </span>
-          . This is not a to-do list. This is your transformation roadmap.
-        </p>
-      </div>
-
-      <div className="flex justify-end">
+      {/* CTA */}
+      <div className="pt-2 border-t border-border">
         <button
-          onClick={() => setScreen("command")}
-          className="group inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 font-bold text-sm hover:bg-primary/90 transition-all"
+          onClick={() => setScreen("today")}
+          className="text-sm font-mono text-primary hover:text-foreground transition-colors"
         >
-          ENTER COMMAND CENTER
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          Go to today &rarr;
         </button>
       </div>
+
+    </div>
+  )
+}
+
+function Section({
+  label, sublabel, content, empty
+}: {
+  label: string
+  sublabel: string
+  content: string
+  empty: string
+}) {
+  return (
+    <div className="space-y-1.5">
+      <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.15em]">{label}</p>
+      <p className="text-[11px] text-muted-foreground/60">{sublabel}</p>
+      <p className={`text-sm leading-relaxed ${content ? "text-foreground" : "text-muted-foreground/40 italic"}`}>
+        {content || empty}
+      </p>
+    </div>
+  )
+}
+
+function Field({
+  label, sublabel, value, onChange, placeholder
+}: {
+  label: string
+  sublabel: string
+  value: string
+  onChange: (v: string) => void
+  placeholder: string
+}) {
+  return (
+    <div className="space-y-1.5">
+      <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.15em]">{label}</p>
+      <p className="text-[11px] text-muted-foreground/60">{sublabel}</p>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        rows={3}
+        className="w-full bg-card border border-border rounded-md text-sm text-foreground placeholder:text-muted-foreground/25 outline-none p-3 resize-none leading-relaxed transition-colors focus:border-primary/50"
+      />
     </div>
   )
 }
