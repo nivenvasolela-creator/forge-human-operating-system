@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist_Mono, Space_Grotesk } from 'next/font/google'
+import { Providers } from '@/lib/providers'
 import './globals.css'
 
 const spaceGrotesk = Space_Grotesk({
@@ -36,7 +37,9 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${geistMono.variable} bg-background dark`}
     >
       <body className="font-sans antialiased min-h-screen bg-background text-foreground">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

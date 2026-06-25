@@ -7,9 +7,40 @@ export function MindDumpScreen() {
   const { completeMindDump, userName, mindDump: savedDump } = useForgeStore()
   const [name, setName] = useState(userName || "")
   const [dump, setDump] = useState(savedDump || "")
-  const [step, setStep] = useState<"name" | "dump">(userName ? "dump" : "name")
+  const [step, setStep] = useState<"name" | "dump" | "processing">(userName ? "dump" : "name")
 
   const wordCount = dump.trim().split(/\s+/).filter(Boolean).length
+
+  const handleBuild = async () => {
+    if (dump.trim().length <= 20) return
+    setStep("processing")
+    await completeMindDump(name.trim(), dump.trim())
+    // Navigation happens inside completeMindDump via setScreen
+  }
+
+  if (step === "processing") {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-xl space-y-6 text-center">
+          <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.2em]">
+            Building your blueprint
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Reading your mind dump. Extracting your goals and identity.
+          </p>
+          <div className="flex justify-center gap-1.5">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-pulse"
+                style={{ animationDelay: `${i * 200}ms` }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
@@ -83,7 +114,7 @@ export function MindDumpScreen() {
               </button>
 
               <button
-                onClick={() => dump.trim().length > 20 && completeMindDump(name.trim(), dump.trim())}
+                onClick={handleBuild}
                 disabled={dump.trim().length <= 20}
                 className="text-sm font-mono text-primary disabled:text-muted-foreground/30 transition-colors hover:text-foreground"
               >

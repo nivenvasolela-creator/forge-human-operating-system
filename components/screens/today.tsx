@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useForgeStore } from "@/lib/forge-store"
+import { InsightBanner } from "@/components/insight-banner"
 
 export function TodayScreen() {
   const {
@@ -112,6 +113,9 @@ export function TodayScreen() {
         <Metric label="Deep work" value={String(totalDeepWorkHours)} unit="hrs total" />
         <Metric label="Done today" value={String(completedToday)} unit={`of ${tasks.length}`} />
       </div>
+
+      {/* Insight banner */}
+      <InsightBanner />
 
       {/* Three tasks */}
       <div className="space-y-4">

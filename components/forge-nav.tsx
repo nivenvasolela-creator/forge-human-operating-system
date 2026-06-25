@@ -1,7 +1,9 @@
 "use client"
 
 import { useForgeStore, type Screen } from "@/lib/forge-store"
+import { useAuth } from "@/lib/auth-context"
 import { cn } from "@/lib/utils"
+import { LogOut } from "lucide-react"
 
 const navItems: { id: Screen; label: string }[] = [
   { id: "minddump", label: "Dump" },
@@ -13,6 +15,7 @@ const navItems: { id: Screen; label: string }[] = [
 
 export function ForgeNav() {
   const { currentScreen, setScreen, userName, onboardingComplete } = useForgeStore()
+  const { signOut } = useAuth()
 
   if (!onboardingComplete) return null
 
@@ -44,6 +47,15 @@ export function ForgeNav() {
               </button>
             )
           })}
+
+          {/* Sign out button */}
+          <button
+            onClick={signOut}
+            className="text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+            aria-label="Sign out"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </nav>
