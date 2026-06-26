@@ -1,4 +1,3 @@
-import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist_Mono, Space_Grotesk } from 'next/font/google'
 import { Providers } from '@/lib/providers'
@@ -46,7 +45,6 @@ export default function RootLayout({
         <Providers>
           {children}
         </Providers>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )

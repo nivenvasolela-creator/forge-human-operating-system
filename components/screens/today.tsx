@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useForgeStore } from "@/lib/forge-store"
+import { cn } from "@/lib/utils"
 import { Target, Book, Code, Dumbbell, ChevronRight, TrendingUp, Sun, Play } from "lucide-react"
 import { ForgeLogo } from "@/components/forge-logo"
 
@@ -22,9 +23,6 @@ export function TodayScreen() {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
-
-  const activeTasks = tasks.filter((t) => !t.done)
-  const doneTasks = tasks.filter((t) => t.done)
 
   const greeting = () => {
     const h = currentTime.getHours()
@@ -91,7 +89,7 @@ export function TodayScreen() {
           <div className="divide-y divide-border/20">
             {tasks.length > 0 ? (
               tasks.slice(0, 3).map((t, i) => (
-                <div key={t.id} className="p-4 flex items-center gap-4 group cursor-pointer hover:bg-muted/5 transition-colors">
+                <div key={t.id} onClick={() => toggleTask(t.id)} className="p-4 flex items-center gap-4 group cursor-pointer hover:bg-muted/5 transition-colors">
                   <div className="w-10 h-10 rounded-xl bg-foreground/[0.03] flex items-center justify-center shrink-0">
                     {i === 0 ? <Book className="w-5 h-5 text-muted-foreground/60" /> :
                      i === 1 ? <Code className="w-5 h-5 text-muted-foreground/60" /> :
@@ -165,8 +163,4 @@ export function TodayScreen() {
 
     </div>
   )
-}
-
-function cn(...classes: any[]) {
-  return classes.filter(Boolean).join(' ')
 }
