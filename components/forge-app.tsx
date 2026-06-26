@@ -10,6 +10,8 @@ import { BlueprintScreen } from "@/components/screens/blueprint"
 import { TodayScreen } from "@/components/screens/today"
 import { ReflectionScreen } from "@/components/screens/reflection"
 import { MetricsScreen } from "@/components/screens/metrics"
+import { ProfileScreen } from "@/components/screens/profile"
+import { FocusScreen } from "@/components/screens/focus"
 
 export function ForgeApp() {
   const { loading, user } = useAuth()
@@ -19,7 +21,6 @@ export function ForgeApp() {
   // Hydrate from server when user is authenticated
   useEffect(() => {
     if (user && !isHydrated) {
-      console.log("Starting hydration for user:", user.id)
       hydrateFromServer(user.id)
     }
   }, [user, isHydrated, hydrateFromServer])
@@ -27,12 +28,10 @@ export function ForgeApp() {
   // Fallback redirect if middleware fails
   useEffect(() => {
     if (!loading && !user) {
-      console.log("No user found, redirecting to login...")
       router.push("/login")
     }
   }, [loading, user, router])
 
-  // 1. Loading State
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -46,7 +45,6 @@ export function ForgeApp() {
     )
   }
 
-  // 2. Not Logged In State
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
@@ -65,7 +63,6 @@ export function ForgeApp() {
     )
   }
 
-  // 3. Authenticated but Syncing State
   if (!isHydrated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -79,21 +76,21 @@ export function ForgeApp() {
     )
   }
 
-  // 4. Onboarding State
   if (!onboardingComplete) {
     return <MindDumpScreen />
   }
 
-  // 5. Main App State
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/10">
       <ForgeNav />
       <main className="pb-32 md:pb-40">
-        {currentScreen === "blueprint" && <BlueprintScreen />}
         {currentScreen === "today" && <TodayScreen />}
-        {currentScreen === "reflection" && <ReflectionScreen />}
+        {currentScreen === "blueprint" && <BlueprintScreen />}
+        {currentScreen === "focus" && <FocusScreen />}
         {currentScreen === "metrics" && <MetricsScreen />}
+        {currentScreen === "profile" && <ProfileScreen />}
         {currentScreen === "minddump" && <MindDumpScreen />}
+        {currentScreen === "reflection" && <ReflectionScreen />}
       </main>
     </div>
   )

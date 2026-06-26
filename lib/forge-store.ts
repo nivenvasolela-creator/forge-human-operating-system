@@ -3,7 +3,7 @@
 import { create } from "zustand"
 import { createClient } from "./supabase/client"
 
-export type Screen = "minddump" | "blueprint" | "today" | "reflection" | "metrics"
+export type Screen = "today" | "blueprint" | "focus" | "metrics" | "profile" | "minddump" | "reflection"
 
 export interface Task {
   id: string
