@@ -44,7 +44,7 @@ export function ForgeApp() {
   return (
     <div className="min-h-screen bg-background">
       <ForgeNav />
-      <main className="pt-12">
+      <main className="pt-12 md:pt-20 pb-24 md:pb-12">
         {currentScreen === "blueprint" && <BlueprintScreen />}
         {currentScreen === "today" && <TodayScreen />}
         {currentScreen === "reflection" && <ReflectionScreen />}

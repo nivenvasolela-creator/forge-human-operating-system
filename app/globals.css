@@ -122,14 +122,25 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    /* Prevent horizontal overflow and handle mobile notches */
+    @apply overflow-x-hidden;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+    /* Fixed height issues on mobile Safari */
+    -webkit-text-size-adjust: 100%;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-sans tracking-tight;
+  }
+
+  /* Make interactive elements feel better on touch */
+  button, a, input, textarea {
+    @apply touch-manipulation;
   }
 }
 

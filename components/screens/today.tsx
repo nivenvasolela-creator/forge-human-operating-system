@@ -19,6 +19,8 @@ export function TodayScreen() {
     totalDeepWorkHours,
     streakDays,
     completedToday,
+    optimalTaskCount,
+    optimalHours,
   } = useForgeStore()
 
   const [input, setInput] = useState("")
@@ -30,7 +32,10 @@ export function TodayScreen() {
 
   const activeTasks = tasks.filter((t) => !t.done)
   const doneTasks = tasks.filter((t) => t.done)
-  const canAddMore = activeTasks.length < 3
+  const canAddMore = activeTasks.length < optimalTaskCount
+
+  const currentHour = new Date().getHours()
+  const isOptimalHour = optimalHours.includes(currentHour)
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -96,19 +101,19 @@ export function TodayScreen() {
   }
 
   return (
-    <div className="max-w-xl mx-auto py-12 px-6 space-y-12">
+    <div className="max-w-xl mx-auto py-6 md:py-12 px-6 space-y-10 md:space-y-12">
 
       {/* Header */}
       <div className="space-y-1">
-        <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.2em]">Today</p>
-        <h1 className="text-2xl font-semibold text-foreground">
+        <p className="text-[10px] md:text-xs font-mono text-muted-foreground uppercase tracking-[0.2em]">Today</p>
+        <h1 className="text-xl md:text-2xl font-semibold text-foreground">
           {greeting()}{userName ? `, ${userName}` : ""}.
         </h1>
-        <p className="text-sm text-muted-foreground">{today}</p>
+        <p className="text-xs md:text-sm text-muted-foreground">{today}</p>
       </div>
 
       {/* Metrics strip */}
-      <div className="flex gap-8">
+      <div className="flex gap-6 md:gap-8 overflow-x-auto pb-2 no-scrollbar">
         <Metric label="Streak" value={String(streakDays)} unit="days" />
         <Metric label="Deep work" value={String(totalDeepWorkHours)} unit="hrs total" />
         <Metric label="Done today" value={String(completedToday)} unit={`of ${tasks.length}`} />
@@ -124,13 +129,13 @@ export function TodayScreen() {
             What matters today
           </p>
           <p className="text-xs font-mono text-muted-foreground/50">
-            {activeTasks.length}/3
+            {activeTasks.length}/{optimalTaskCount}
           </p>
         </div>
 
         {destination && activeTasks.length === 0 && (
           <p className="text-xs text-muted-foreground/50 italic leading-relaxed">
-            Pick 3 tasks that move you toward: &ldquo;{destination.slice(0, 80)}{destination.length > 80 ? "…" : ""}&rdquo;
+            Pick {optimalTaskCount} tasks that move you toward: &ldquo;{destination.slice(0, 80)}{destination.length > 80 ? "…" : ""}&rdquo;
           </p>
         )}
 
@@ -191,7 +196,14 @@ export function TodayScreen() {
 
       {/* Deep work timer */}
       <div className="space-y-4">
-        <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.2em]">Deep work</p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.2em]">Deep work</p>
+          {isOptimalHour && (
+            <span className="text-[10px] font-mono text-primary animate-pulse uppercase tracking-wider">
+              Peak Focus Window
+            </span>
+          )}
+        </div>
 
         {/* Progress bar */}
         <div className="space-y-2">
@@ -277,10 +289,10 @@ export function TodayScreen() {
 
 function Metric({ label, value, unit }: { label: string; value: string; unit: string }) {
   return (
-    <div>
-      <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-0.5">{label}</p>
-      <p className="text-xl font-semibold text-foreground leading-none">{value}</p>
-      <p className="text-xs text-muted-foreground mt-0.5">{unit}</p>
+    <div className="shrink-0">
+      <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-0.5">{label}</p>
+      <p className="text-lg md:text-xl font-semibold text-foreground leading-none">{value}</p>
+      <p className="text-[10px] text-muted-foreground mt-0.5">{unit}</p>
     </div>
   )
 }

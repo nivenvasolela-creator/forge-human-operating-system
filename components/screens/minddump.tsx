@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useForgeStore } from "@/lib/forge-store"
+import { ForgeLogo } from "@/components/forge-logo"
 
 export function MindDumpScreen() {
   const { completeMindDump, userName, mindDump: savedDump } = useForgeStore()
@@ -21,13 +22,18 @@ export function MindDumpScreen() {
   if (step === "processing") {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
-        <div className="w-full max-w-xl space-y-6 text-center">
-          <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.2em]">
-            Building your blueprint
-          </p>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Reading your mind dump. Extracting your goals and identity.
-          </p>
+        <div className="w-full max-w-xl space-y-8 text-center">
+          <div className="flex justify-center">
+            <ForgeLogo className="w-20 h-20 animate-pulse" />
+          </div>
+          <div className="space-y-4">
+            <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.2em]">
+              Building your blueprint
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Reading your mind dump. Extracting your goals and identity.
+            </p>
+          </div>
           <div className="flex justify-center gap-1.5">
             {[0, 1, 2].map((i) => (
               <span
@@ -45,6 +51,9 @@ export function MindDumpScreen() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-xl">
+        <div className="mb-12 flex justify-center">
+          <ForgeLogo className="w-12 h-12 opacity-50" />
+        </div>
 
         {step === "name" ? (
           <div className="space-y-10">

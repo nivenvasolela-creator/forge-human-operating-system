@@ -52,16 +52,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     })
 
-    if (!error && data.user) {
-      // Create profile
-      await supabase.from('profiles').insert({
-        id: data.user.id,
-        name,
-        email,
-      })
-    }
+    // Profile is now handled by the database trigger (20260625212108_002_auto_profile_trigger.sql)
+    // This prevents RLS errors during the signup flow.
 
-    return { error: error as Error | null }
+    return {
+      error: error as Error | null,
+      session: data.session
+    }
   }
 
   const signIn = async (email: string, password: string) => {

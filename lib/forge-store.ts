@@ -46,6 +46,12 @@ export interface Insight {
   expires_at: string | null
 }
 
+export interface BehaviorPattern {
+  type: string
+  data: any
+  confidence: number
+}
+
 export interface ForgeState {
   // Onboarding / identity
   onboardingComplete: boolean
@@ -64,6 +70,8 @@ export interface ForgeState {
   tasks: Task[]
   deepWorkMinutes: number
   deepWorkGoal: number
+  optimalTaskCount: number
+  optimalHours: number[]
 
   // Deep work sessions
   deepWorkSessions: DeepWorkSession[]
@@ -73,6 +81,7 @@ export interface ForgeState {
 
   // Insights
   insights: Insight[]
+  patterns: BehaviorPattern[]
 
   // Metrics
   streakDays: number
@@ -127,9 +136,12 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   tasks: [],
   deepWorkMinutes: 0,
   deepWorkGoal: 240,
+  optimalTaskCount: 3,
+  optimalHours: [],
   deepWorkSessions: [],
   reflections: [],
   insights: [],
+  patterns: [],
   streakDays: 0,
   totalDeepWorkHours: 0,
   completedToday: 0,
@@ -161,9 +173,24 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
     })
 
     // Trigger blueprint generation edge function
-    await supabase.functions.invoke("generate-blueprint", {
+    const { data, error } = await supabase.functions.invoke("generate-blueprint", {
       body: { user_id: user.id, mind_dump: dump },
     })
+
+    if (!error && data?.blueprint) {
+      const { blueprint } = data
+      set({
+        destination: blueprint.destination,
+        currentReality: blueprint.current_reality,
+        gap: blueprint.gap,
+        milestones: blueprint.milestones.map((m: any, i: number) => ({
+          id: String(i + 1),
+          label: m.label,
+          timeframe: m.timeframe,
+          done: false,
+        })),
+      })
+    }
   },
 
   setMindDump: (dump) => set({ mindDump: dump }),
@@ -214,8 +241,8 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   setTasks: (tasks) => set({ tasks }),
 
   addTask: async (text) => {
-    const { tasks } = get()
-    if (tasks.filter((t) => !t.done).length >= 3) return
+    const { tasks, optimalTaskCount } = get()
+    if (tasks.filter((t) => !t.done).length >= optimalTaskCount) return
 
     const newTask: Task = {
       id: crypto.randomUUID(),
@@ -404,6 +431,12 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       .order("created_at", { ascending: false })
       .limit(5)
 
+    // Load patterns
+    const { data: patterns } = await supabase
+      .from("behavior_patterns")
+      .select("*")
+      .eq("user_id", userId)
+
     // Parse tasks from latest log
     let parsedTasks: Task[] = []
     if (latestLog?.tasks) {
@@ -414,6 +447,10 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       }
     }
 
+    // Extract specific adaptive defaults from patterns
+    const optimalTaskCount = patterns?.find(p => p.pattern_type === 'optimal_task_count')?.pattern_data?.count || profile?.optimal_task_count || 3
+    const optimalHours = patterns?.find(p => p.pattern_type === 'optimal_hours')?.pattern_data || []
+
     // Merge with defaults
     set({
       userName: profile?.name || "",
@@ -422,6 +459,8 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       currentReality: profile?.current_reality || "",
       gap: profile?.gap || "",
       deepWorkGoal: profile?.deep_work_goal_minutes || 240,
+      optimalTaskCount,
+      optimalHours,
       streakDays: latestLog?.streak_days || 0,
       totalDeepWorkHours: latestLog ? (latestLog.deep_work_minutes || 0) / 60 : 0,
       insights: (insights || []).map((i) => ({
@@ -432,6 +471,11 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
         is_dismissed: i.is_dismissed,
         created_at: i.created_at,
         expires_at: i.expires_at,
+      })),
+      patterns: (patterns || []).map(p => ({
+        type: p.pattern_type,
+        data: p.pattern_data,
+        confidence: p.confidence_score
       })),
       reflections: (reflections || []).map((r) => ({
         id: r.id,
