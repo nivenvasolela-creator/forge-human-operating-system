@@ -1,232 +1,172 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { useForgeStore } from "@/lib/forge-store"
+import { Target, Book, Code, Dumbbell, ChevronRight, TrendingUp, Sun, Play } from "lucide-react"
+import { ForgeLogo } from "@/components/forge-logo"
 
 export function TodayScreen() {
   const {
     userName,
     tasks,
     destination,
-    addTask,
-    toggleTask,
-    removeTask,
-    logDeepWork,
     optimalTaskCount,
+    toggleTask,
+    insights,
+    patterns,
   } = useForgeStore()
 
-  const [input, setInput] = useState("")
-  const [timerRunning, setTimerRunning] = useState(false)
-  const [timerSeconds, setTimerSeconds] = useState(0)
-  const [sessionLabel, setSessionLabel] = useState("")
-  const [showTimerInput, setShowTimerInput] = useState(false)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [currentTime, setCurrentTime] = useState(new Date())
 
-  const activeTasks = tasks.filter((t) => !t.done)
-  const doneTasks = tasks.filter((t) => t.done)
-  const canAddMore = activeTasks.length < optimalTaskCount
-
-  // Update clock
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
 
-  // Timer logic
-  useEffect(() => {
-    if (timerRunning) {
-      intervalRef.current = setInterval(() => {
-        setTimerSeconds((s) => s + 1)
-      }, 1000)
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [timerRunning])
-
-  const formatTime = (secs: number) => {
-    const h = Math.floor(secs / 3600)
-    const m = Math.floor((secs % 3600) / 60)
-    const s = secs % 60
-    return h > 0
-      ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
-      : `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
-  }
-
-  const stopTimer = () => {
-    setTimerRunning(false)
-    if (timerSeconds >= 60) {
-      logDeepWork(Math.floor(timerSeconds / 60))
-    }
-    setTimerSeconds(0)
-    setSessionLabel("")
-    setShowTimerInput(false)
-  }
-
-  const startTimer = () => {
-    setTimerRunning(true)
-    setShowTimerInput(false)
-  }
-
-  const handleAdd = () => {
-    if (!input.trim() || !canAddMore) return
-    addTask(input.trim())
-    setInput("")
-  }
+  const activeTasks = tasks.filter((t) => !t.done)
+  const doneTasks = tasks.filter((t) => t.done)
 
   const greeting = () => {
     const h = currentTime.getHours()
-    if (h < 12) return "Good morning"
-    if (h < 17) return "Good afternoon"
-    return "Good evening"
+    if (h < 12) return "Good Morning"
+    if (h < 17) return "Good Afternoon"
+    return "Good Evening"
+  }
+
+  // Find the most relevant insight
+  const activeInsight = insights.find(i => !i.is_dismissed) || {
+    insight_text: "You consistently perform your best between 07:00 and 10:00.",
+    category: "Your most productive hours"
   }
 
   return (
-    <div className="max-w-xl mx-auto py-12 md:py-24 px-8 md:px-0 space-y-16 animate-in fade-in duration-700">
+    <div className="max-w-xl mx-auto pt-6 pb-32 px-6 space-y-8 animate-in fade-in duration-700">
 
-      {/* 01. Time & Greeting */}
-      <div className="space-y-4">
-        <p className="text-4xl md:text-5xl font-mono tracking-tighter text-foreground font-light">
-          {currentTime.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: false })}
-        </p>
-        <h1 className="text-xl md:text-2xl text-muted-foreground font-light tracking-tight">
-          {greeting()}{userName ? `, ${userName}` : ""}. <span className="text-foreground/80">Today matters.</span>
-        </h1>
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
+        <ForgeLogo className="w-8 h-8 opacity-90" />
+        <button className="p-2 rounded-full hover:bg-foreground/5 transition-colors">
+          <Sun className="w-5 h-5 text-muted-foreground" />
+        </button>
       </div>
 
-      <hr className="border-foreground/5" />
+      {/* Greeting */}
+      <div className="space-y-1">
+        <h1 className="text-[32px] leading-tight text-muted-foreground font-medium">
+          {greeting()},<br />
+          <span className="text-foreground font-bold">{userName || "Niven"}<span className="text-primary">.</span></span>
+        </h1>
+        <p className="text-sm text-muted-foreground/60 font-medium">
+          Discipline today. Freedom tomorrow.
+        </p>
+      </div>
 
-      {/* 02. Your Mission */}
-      <div className="space-y-6">
-        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em] font-bold">
+      {/* Mission Section */}
+      <div className="space-y-3">
+        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] font-bold">
           Your Mission
         </p>
-        <p className="text-lg md:text-xl text-foreground font-medium leading-relaxed">
-          {destination || "Define your becoming in the Blueprint."}
+        <div className="bg-card p-5 rounded-3xl border border-border/40 shadow-sm flex items-center gap-4 group cursor-pointer hover:border-primary/20 transition-all">
+          <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0">
+            <Target className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-base font-bold text-foreground truncate">
+              {destination || "Become an AI Founder"}<span className="text-primary">.</span>
+            </h2>
+            <p className="text-[11px] text-muted-foreground font-medium line-clamp-1">
+              Build valuable. Solve hard problems. Create freedom.
+            </p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+        </div>
+      </div>
+
+      {/* Today Section */}
+      <div className="space-y-3">
+        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] font-bold">
+          Today
         </p>
-      </div>
-
-      <hr className="border-foreground/5" />
-
-      {/* 03. Today's Tasks */}
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em] font-bold">
-            Next Steps
-          </p>
-          <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-widest">
-            {activeTasks.length}/{optimalTaskCount}
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          {activeTasks.map((t) => (
-            <div key={t.id} className="flex items-center gap-6 group">
-              <button
-                onClick={() => toggleTask(t.id)}
-                className="w-6 h-6 rounded-full border border-foreground/10 flex items-center justify-center shrink-0 transition-all hover:border-primary/50 hover:bg-primary/5 active:scale-90"
-              />
-              <span className="text-lg text-foreground/90 font-light leading-snug flex-1">{t.text}</span>
-              <button
-                onClick={() => removeTask(t.id)}
-                className="opacity-0 group-hover:opacity-40 hover:opacity-100 transition-opacity text-xs font-mono p-2"
-              >
-                &times;
-              </button>
-            </div>
-          ))}
-
-          {doneTasks.map((t) => (
-            <div key={t.id} className="flex items-center gap-6 opacity-30">
-              <button
-                onClick={() => toggleTask(t.id)}
-                className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0"
-              >
-                <div className="w-2 h-2 rounded-full bg-primary" />
-              </button>
-              <span className="text-lg text-foreground line-through font-light leading-snug">{t.text}</span>
-            </div>
-          ))}
-
-          {canAddMore && (
-            <div className="flex items-center gap-6">
-              <div className="w-6 h-6 rounded-full border border-dashed border-foreground/10 shrink-0" />
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-                placeholder="What is the next step?"
-                className="flex-1 bg-transparent text-lg text-foreground font-light placeholder:text-muted-foreground/20 outline-none border-none py-1"
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      <hr className="border-foreground/5" />
-
-      {/* 04. Focus Action */}
-      <div className="pt-4 flex justify-center">
-        {timerRunning ? (
-          <div className="flex flex-col items-center gap-8 w-full">
-            <div className="text-6xl md:text-7xl font-mono font-extralight tracking-tighter text-foreground tabular-nums">
-              {formatTime(timerSeconds)}
-            </div>
-            {sessionLabel && (
-              <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest animate-pulse">
-                FOCUSING ON: {sessionLabel}
-              </p>
+        <div className="bg-card rounded-[2.5rem] border border-border/40 shadow-sm overflow-hidden">
+          <div className="divide-y divide-border/20">
+            {tasks.length > 0 ? (
+              tasks.slice(0, 3).map((t, i) => (
+                <div key={t.id} className="p-4 flex items-center gap-4 group cursor-pointer hover:bg-muted/5 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-foreground/[0.03] flex items-center justify-center shrink-0">
+                    {i === 0 ? <Book className="w-5 h-5 text-muted-foreground/60" /> :
+                     i === 1 ? <Code className="w-5 h-5 text-muted-foreground/60" /> :
+                     <Dumbbell className="w-5 h-5 text-muted-foreground/60" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <div className={cn("w-1.5 h-1.5 rounded-full", t.done ? "bg-muted-foreground/20" : "bg-primary")} />
+                      <h3 className={cn("text-[13px] font-bold truncate", t.done ? "text-muted-foreground line-through" : "text-foreground")}>
+                        {t.text}
+                      </h3>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground font-medium ml-3.5">
+                      {i === 0 ? "Strategic Work" : i === 1 ? "Technical Debt" : "Health & Vitality"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-mono text-muted-foreground/30">
+                      {i === 0 ? "07:00 - 09:00" : i === 1 ? "09:30 - 12:30" : "18:00 - 18:45"}
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/20" />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-8 text-center">
+                <p className="text-xs font-mono text-muted-foreground/40 uppercase tracking-widest">No tasks defined for today</p>
+              </div>
             )}
-            <button
-              onClick={stopTimer}
-              className="text-[10px] font-mono bg-foreground text-background px-12 py-4 rounded-full uppercase tracking-[0.3em] font-bold hover:opacity-90 transition-all shadow-xl active:scale-95"
-            >
-              Log Session
+          </div>
+
+          <div className="p-4 bg-muted/5">
+            <button className="w-full bg-primary text-white p-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                <Play className="w-3 h-3 fill-current ml-0.5" />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-[0.15em]">Begin Focus Session</span>
             </button>
+            <p className="text-[9px] text-muted-foreground/40 font-mono text-center mt-3 uppercase tracking-widest">
+              Eliminate distractions. Build the future.
+            </p>
           </div>
-        ) : showTimerInput ? (
-          <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <input
-              autoFocus
-              value={sessionLabel}
-              onChange={(e) => setSessionLabel(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && startTimer()}
-              placeholder="What are you building now?"
-              className="w-full bg-transparent border-b border-foreground/5 text-xl md:text-2xl text-foreground font-light placeholder:text-muted-foreground/20 outline-none py-4 text-center transition-colors focus:border-primary/20"
-            />
-            <div className="flex justify-center gap-8">
-              <button
-                onClick={startTimer}
-                className="text-[10px] font-mono bg-primary text-primary-foreground px-12 py-4 rounded-full uppercase tracking-[0.3em] font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20 active:scale-95"
-              >
-                Begin Focus
-              </button>
-              <button
-                onClick={() => setShowTimerInput(false)}
-                className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em] font-bold hover:text-foreground px-4 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
+        </div>
+      </div>
+
+      {/* Insight Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] font-bold">
+            Insight
+          </p>
+          <span className="text-[9px] font-mono text-muted-foreground/30 uppercase tracking-widest">
+            Updated {currentTime.getHours()}:00
+          </span>
+        </div>
+        <div className="bg-card p-5 rounded-3xl border border-border/40 shadow-sm flex items-center gap-4 group cursor-pointer hover:border-primary/20 transition-all">
+          <div className="w-12 h-12 rounded-2xl bg-foreground flex items-center justify-center shrink-0">
+            <TrendingUp className="w-6 h-6 text-background" />
           </div>
-        ) : (
-          <button
-            onClick={() => setShowTimerInput(true)}
-            className="group flex flex-col items-center gap-4 transition-all hover:scale-105 active:scale-95"
-          >
-            <div className="w-20 h-20 rounded-full border border-foreground/5 flex items-center justify-center transition-all group-hover:border-primary/30 group-hover:bg-primary/5">
-              <div className="w-3 h-3 rounded-full bg-primary/40 group-hover:bg-primary animate-pulse" />
-            </div>
-            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.4em] font-bold group-hover:text-primary transition-colors">
-              Begin Focus
-            </span>
-          </button>
-        )}
+          <div className="flex-1 min-w-0">
+            <h2 className="text-[13px] font-bold text-foreground">
+              {activeInsight.category || "Behavior Pattern"}
+            </h2>
+            <p className="text-[11px] text-muted-foreground font-medium line-clamp-2">
+              {activeInsight.insight_text}
+            </p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+        </div>
       </div>
 
     </div>
   )
+}
+
+function cn(...classes: any[]) {
+  return classes.filter(Boolean).join(' ')
 }
