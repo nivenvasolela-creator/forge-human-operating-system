@@ -19,11 +19,17 @@ export const metadata: Metadata = {
   title: 'Alera — Convert dreams into a system',
   description: 'Dump your mind. Get a blueprint. Know what matters today. Reflect tonight. The simplest system for becoming who you want to be.',
   generator: 'v0.app',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Alera',
+  },
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
-  themeColor: '#0d0d0d',
+  colorScheme: 'light dark',
+  themeColor: '#F7F7F5',
 }
 
 export default function RootLayout({
@@ -34,7 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${geistMono.variable} bg-background dark`}
+      className={`${spaceGrotesk.variable} ${geistMono.variable} bg-background`}
     >
       <body className="font-sans antialiased min-h-screen bg-background text-foreground">
         <Providers>

@@ -391,112 +391,118 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
     }),
 
   hydrateFromServer: async (userId: string) => {
-    const supabase = createClient()
+    try {
+      const supabase = createClient()
 
-    // Load profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single()
+      // Load profile
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single()
 
-    // Load latest daily log
-    const { data: latestLog } = await supabase
-      .from("daily_logs")
-      .select("*")
-      .eq("user_id", userId)
-      .order("log_date", { ascending: false })
-      .limit(1)
-      .maybeSingle()
+      // Load latest daily log
+      const { data: latestLog } = await supabase
+        .from("daily_logs")
+        .select("*")
+        .eq("user_id", userId)
+        .order("log_date", { ascending: false })
+        .limit(1)
+        .maybeSingle()
 
-    // Load milestone progress
-    const { data: milestoneProgress } = await supabase
-      .from("milestone_progress")
-      .select("*")
-      .eq("user_id", userId)
+      // Load milestone progress
+      const { data: milestoneProgress } = await supabase
+        .from("milestone_progress")
+        .select("*")
+        .eq("user_id", userId)
 
-    // Load reflections
-    const { data: reflections } = await supabase
-      .from("reflections")
-      .select("*")
-      .eq("user_id", userId)
-      .order("reflection_date", { ascending: false })
+      // Load reflections
+      const { data: reflections } = await supabase
+        .from("reflections")
+        .select("*")
+        .eq("user_id", userId)
+        .order("reflection_date", { ascending: false })
 
-    // Load insights
-    const { data: insights } = await supabase
-      .from("insights")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("is_dismissed", false)
-      .order("created_at", { ascending: false })
-      .limit(5)
+      // Load insights
+      const { data: insights } = await supabase
+        .from("insights")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("is_dismissed", false)
+        .order("created_at", { ascending: false })
+        .limit(5)
 
-    // Load patterns
-    const { data: patterns } = await supabase
-      .from("behavior_patterns")
-      .select("*")
-      .eq("user_id", userId)
+      // Load patterns
+      const { data: patterns } = await supabase
+        .from("behavior_patterns")
+        .select("*")
+        .eq("user_id", userId)
 
-    // Parse tasks from latest log
-    let parsedTasks: Task[] = []
-    if (latestLog?.tasks) {
-      try {
-        parsedTasks = JSON.parse(latestLog.tasks)
-      } catch {
-        parsedTasks = []
+      // Parse tasks from latest log
+      let parsedTasks: Task[] = []
+      if (latestLog?.tasks) {
+        try {
+          parsedTasks = JSON.parse(latestLog.tasks)
+        } catch {
+          parsedTasks = []
+        }
       }
+
+      // Extract specific adaptive defaults from patterns
+      const optimalTaskCount = patterns?.find(p => p.pattern_type === 'optimal_task_count')?.pattern_data?.count || profile?.optimal_task_count || 3
+      const optimalHours = patterns?.find(p => p.pattern_type === 'optimal_hours')?.pattern_data || []
+
+      // Merge with defaults
+      set({
+        userName: profile?.name || "",
+        mindDump: profile?.mind_dump || "",
+        destination: profile?.destination || "",
+        currentReality: profile?.current_reality || "",
+        gap: profile?.gap || "",
+        deepWorkGoal: profile?.deep_work_goal_minutes || 240,
+        optimalTaskCount,
+        optimalHours,
+        streakDays: latestLog?.streak_days || 0,
+        totalDeepWorkHours: latestLog ? (latestLog.deep_work_minutes || 0) / 60 : 0,
+        insights: (insights || []).map((i) => ({
+          id: i.id,
+          insight_text: i.insight_text,
+          insight_type: i.insight_type as "immediate" | "weekly" | "adjustment",
+          category: i.category || "",
+          is_dismissed: i.is_dismissed,
+          created_at: i.created_at,
+          expires_at: i.expires_at,
+        })),
+        patterns: (patterns || []).map(p => ({
+          type: p.pattern_type,
+          data: p.pattern_data,
+          confidence: p.confidence_score
+        })),
+        reflections: (reflections || []).map((r) => ({
+          id: r.id,
+          date: r.reflection_date,
+          did: r.did,
+          blocked: r.blocked || "",
+          tomorrow: r.tomorrow || "",
+        })),
+        milestones: milestoneProgress?.length
+          ? milestoneProgress.map((m) => ({
+              id: m.milestone_id,
+              label: m.milestone_label,
+              timeframe: m.timeframe,
+              done: m.is_completed,
+            }))
+          : defaultMilestones,
+        tasks: parsedTasks,
+        onboardingComplete: !!(profile?.mind_dump && profile?.mind_dump.length > 20),
+        currentScreen: "today",
+        isHydrated: true,
+      })
+    } catch (e) {
+      console.error("Hydration Error:", e)
+      // Ensure we still mark as hydrated so the app doesn't stay in loading screen
+      set({ isHydrated: true })
     }
-
-    // Extract specific adaptive defaults from patterns
-    const optimalTaskCount = patterns?.find(p => p.pattern_type === 'optimal_task_count')?.pattern_data?.count || profile?.optimal_task_count || 3
-    const optimalHours = patterns?.find(p => p.pattern_type === 'optimal_hours')?.pattern_data || []
-
-    // Merge with defaults
-    set({
-      userName: profile?.name || "",
-      mindDump: profile?.mind_dump || "",
-      destination: profile?.destination || "",
-      currentReality: profile?.current_reality || "",
-      gap: profile?.gap || "",
-      deepWorkGoal: profile?.deep_work_goal_minutes || 240,
-      optimalTaskCount,
-      optimalHours,
-      streakDays: latestLog?.streak_days || 0,
-      totalDeepWorkHours: latestLog ? (latestLog.deep_work_minutes || 0) / 60 : 0,
-      insights: (insights || []).map((i) => ({
-        id: i.id,
-        insight_text: i.insight_text,
-        insight_type: i.insight_type as "immediate" | "weekly" | "adjustment",
-        category: i.category || "",
-        is_dismissed: i.is_dismissed,
-        created_at: i.created_at,
-        expires_at: i.expires_at,
-      })),
-      patterns: (patterns || []).map(p => ({
-        type: p.pattern_type,
-        data: p.pattern_data,
-        confidence: p.confidence_score
-      })),
-      reflections: (reflections || []).map((r) => ({
-        id: r.id,
-        date: r.reflection_date,
-        did: r.did,
-        blocked: r.blocked || "",
-        tomorrow: r.tomorrow || "",
-      })),
-      milestones: milestoneProgress?.length
-        ? milestoneProgress.map((m) => ({
-            id: m.milestone_id,
-            label: m.milestone_label,
-            timeframe: m.timeframe,
-            done: m.is_completed,
-          }))
-        : defaultMilestones,
-      tasks: parsedTasks,
-      onboardingComplete: !!(profile?.mind_dump && profile?.mind_dump.length > 20),
-      currentScreen: "today",
-      isHydrated: true,
-    })
   },
 
   syncToServer: async () => {

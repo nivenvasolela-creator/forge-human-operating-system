@@ -10,13 +10,13 @@ export function ForgeLogo({ className }: { className?: string }) {
     >
       <defs>
         <linearGradient id="metal-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f3f4f6" />
-          <stop offset="50%" stopColor="#9ca3af" />
-          <stop offset="100%" stopColor="#4b5563" />
+          <stop offset="0%" stopColor="#94a3b8" />
+          <stop offset="50%" stopColor="#475569" />
+          <stop offset="100%" stopColor="#1e293b" />
         </linearGradient>
-        <filter id="orange-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feFlood floodColor="#ff7a00" floodOpacity="0.5" result="color" />
+        <filter id="orange-glow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feFlood floodColor="#f97316" floodOpacity="0.6" result="color" />
           <feComposite in="color" in2="blur" operator="in" result="glow" />
           <feMerge>
             <feMergeNode in="glow" />
