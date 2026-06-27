@@ -1,0 +1,6 @@
+name = "forge-mcp-server"
+main = "src/index.ts"
+compatibility_date = "2024-04-03"
+
+[vars]
+GITHUB_REPO = "nivenvasolela-creator/forge-human-operating-system"
