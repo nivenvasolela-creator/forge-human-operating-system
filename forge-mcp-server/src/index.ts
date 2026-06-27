@@ -24,7 +24,7 @@ server.tool(
     return {
       content: [{
         type: "text",
-        text: `FORGE CONTROLLER: New page generated - ${pageName}.tsx\n\nINTENT: ${description}\n\nReview the code and use 'push_to_github' to apply changes.`
+        text: `FORGE CONTROLLER: New page generated - ${pageName}.tsx\n\nINTENT: ${description}\n\nReview the code and use 'open_github_pr' to propose the change.`
       }],
     };
   }
@@ -40,12 +40,16 @@ server.tool(
     branchName: z.string().describe("The temporary feature branch"),
     title: z.string().describe("Descriptive PR title"),
     body: z.string().describe("Detailed breakdown of changes made by the AI"),
+    files: z.array(z.object({
+      path: z.string(),
+      content: z.string()
+    })).describe("The files and contents to commit"),
   },
-  async ({ branchName, title, body }) => {
+  async ({ branchName, title, body, files }) => {
     return {
       content: [{
         type: "text",
-        text: `FORGE CONTROLLER: PR Request initiated.\nBRANCH: ${branchName}\nTITLE: ${title}\nSUMMARY:\n${body}`
+        text: `FORGE CONTROLLER: PR Request initiated.\nBRANCH: ${branchName}\nTITLE: ${title}\nFILES: ${files.map(f => f.path).join(", ")}\nSUMMARY:\n${body}`
       }],
     };
   }
@@ -71,18 +75,26 @@ server.tool(
   }
 );
 
+// Map of active transports keyed by session/id if needed,
+// but for simple SSE with ChatGPT Developer Mode, we handle per-request.
 let transport: SSEServerTransport | null = null;
 
-// The MCP Entry point for ChatGPT Developer Mode
+// The MCP Entry point for ChatGPT Developer Mode (SSE Transport)
 app.get("/mcp", async (c) => {
+  // SSEServerTransport takes the endpoint for POSTing messages and the response object
   transport = new SSEServerTransport("/events", c.res);
   await server.connect(transport);
+
+  // SSEServerTransport handles the response headers and initial connection
+  // We return the raw response from the transport
   return c.res;
 });
 
-// SSE Events Handler
+// SSE Events Handler (ChatGPT POSTs messages here)
 app.post("/events", async (c) => {
-  if (!transport) return c.text("No active session", 400);
+  if (!transport) {
+    return c.text("No active MCP session. Connect to /mcp first.", 400);
+  }
   await transport.handlePost(c.req.raw, c.res);
   return c.text("OK");
 });
