@@ -60,18 +60,28 @@ export interface ForgeState {
   // Mind Dump
   mindDump: string
 
-  // Blueprint
+  // Blueprint (Identity Engine Outputs)
   destination: string
   currentReality: string
   gap: string
   milestones: Milestone[]
+  principles: string[]
+  standards: string[]
 
-  // Today
+  // Workspace (Execution Engine)
+  dailyMission: string
   tasks: Task[]
   deepWorkMinutes: number
   deepWorkGoal: number
   optimalTaskCount: number
   optimalHours: number[]
+
+  // Execution Reality (The Mirror)
+  executionGap: {
+    planned: number
+    actual: number
+    reason: string
+  } | null
 
   // Deep work sessions
   deepWorkSessions: DeepWorkSession[]
@@ -133,11 +143,15 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   currentReality: "",
   gap: "",
   milestones: defaultMilestones,
+  principles: [],
+  standards: [],
+  dailyMission: "",
   tasks: [],
   deepWorkMinutes: 0,
   deepWorkGoal: 240,
   optimalTaskCount: 3,
   optimalHours: [],
+  executionGap: null,
   deepWorkSessions: [],
   reflections: [],
   insights: [],
@@ -150,6 +164,8 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   isSyncing: false,
 
   setScreen: (screen) => set({ currentScreen: screen }),
+
+  setDailyMission: (mission: string) => set({ dailyMission: mission }),
 
   completeMindDump: async (name, dump) => {
     const supabase = createClient()
@@ -459,6 +475,9 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
         destination: profile?.destination || "",
         currentReality: profile?.current_reality || "",
         gap: profile?.gap || "",
+        principles: profile?.principles || [],
+        standards: profile?.standards || [],
+        dailyMission: latestLog?.daily_mission || "",
         deepWorkGoal: profile?.deep_work_goal_minutes || 240,
         optimalTaskCount,
         optimalHours,
@@ -506,7 +525,7 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   },
 
   syncToServer: async () => {
-    const { tasks, deepWorkMinutes, deepWorkSessions, isSyncing } = get()
+    const { tasks, dailyMission, deepWorkMinutes, deepWorkSessions, isSyncing } = get()
     if (isSyncing) return
 
     set({ isSyncing: true })
@@ -523,6 +542,7 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       user_id: user.id,
       log_date: new Date().toISOString().split("T")[0],
       tasks: JSON.stringify(tasks),
+      daily_mission: dailyMission,
       tasks_completed_count: tasks.filter((t) => t.done).length,
       tasks_total_count: tasks.length,
       deep_work_minutes: deepWorkMinutes,

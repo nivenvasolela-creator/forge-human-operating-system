@@ -8,8 +8,10 @@ export function ReflectionScreen() {
   const {
     addReflection,
     streakDays,
-    totalDeepWorkHours,
     setScreen,
+    tasks,
+    dailyMission,
+    completedToday,
   } = useForgeStore()
 
   const [did, setDid] = useState("")
@@ -18,6 +20,8 @@ export function ReflectionScreen() {
   const [submitted, setSubmitted] = useState(false)
 
   const canSubmit = did.trim().length > 0
+  const plannedCount = tasks.length
+  const executionRate = plannedCount > 0 ? Math.round((completedToday / plannedCount) * 100) : 0
 
   const handleSubmit = () => {
     if (!canSubmit) return
@@ -27,90 +31,96 @@ export function ReflectionScreen() {
 
   if (submitted) {
     return (
-      <div className="max-w-xl mx-auto py-12 md:py-24 px-8 md:px-0 space-y-16 animate-in fade-in duration-700">
+      <div className="workspace-container">
         <div className="space-y-6">
-          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em] font-bold">
-            Reflection Logged
-          </p>
-          <h1 className="text-3xl md:text-4xl text-foreground font-medium tracking-tight leading-tight">
+          <p className="title-section">Reflection Logged</p>
+          <h1 className="title-huge font-light text-foreground">
             The day is forged.
           </h1>
-          <p className="text-lg text-muted-foreground font-light leading-relaxed">
-            Your system has been adjusted. Rest is now the priority.
+          <p className="text-xl text-muted-foreground font-light leading-relaxed">
+            Your system has been updated. Rest is now the priority.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-y-12 gap-x-8">
-          <Stat label="Current Streak" value={`${streakDays} days`} />
-          <Stat label="Total Focus" value={`${totalDeepWorkHours.toFixed(1)}h`} />
-        </div>
-
-        <div className="pt-12 flex flex-col items-center gap-8">
+        <div className="pt-24 flex flex-col items-center gap-12">
           <button
             onClick={() => setScreen("today")}
-            className="text-[10px] font-mono bg-foreground text-background px-12 py-4 rounded-full uppercase tracking-[0.3em] font-bold hover:opacity-90 transition-all shadow-xl active:scale-95"
+            className="bg-foreground text-background px-16 py-5 rounded-full text-xs font-mono uppercase tracking-[0.4em] font-bold shadow-2xl shadow-foreground/10 hover:scale-[1.02] active:scale-95 transition-all"
           >
             Start Tomorrow
           </button>
-          <button
-            onClick={() => setScreen("blueprint")}
-            className="text-[10px] font-mono text-muted-foreground hover:text-foreground uppercase tracking-[0.3em] font-bold transition-colors"
-          >
-            Review Blueprint
-          </button>
+          <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+            {streakDays} DAY MOMENTUM
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-xl mx-auto py-12 md:py-24 px-8 md:px-0 space-y-24 animate-in fade-in duration-700">
+    <div className="workspace-container">
 
-      {/* 01. Reflection Header */}
-      <div className="space-y-6">
-        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em] font-bold">
-          End of Day
-        </p>
-        <h1 className="text-3xl md:text-4xl text-foreground font-medium tracking-tight leading-tight">
-          Review the mission.
-        </h1>
-        <p className="text-lg text-muted-foreground font-light leading-relaxed">
-          Three questions. No distractions. Close the slate.
-        </p>
+      {/* 01. The Mirror */}
+      <div className="space-y-12">
+        <div className="space-y-6">
+          <p className="title-section">The Mirror</p>
+          <h1 className="title-huge font-light text-foreground">
+            Confront the reality.
+          </h1>
+        </div>
+
+        <div className="space-y-8 p-12 bg-card rounded-[3rem] border border-foreground/5 shadow-2xl shadow-foreground/5">
+          <div className="space-y-2">
+            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Today&apos;s Mission</p>
+            <p className="text-xl text-foreground font-light">{dailyMission || "No mission defined."}</p>
+          </div>
+
+          <div className="flex justify-between items-end">
+            <div className="space-y-2">
+              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Execution</p>
+              <p className="text-3xl font-mono text-primary font-bold">{executionRate}%</p>
+            </div>
+            <div className="text-right space-y-1">
+              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Gap</p>
+              <p className="text-sm text-foreground/60">{completedToday} of {plannedCount} actions completed</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* 02. Questions */}
-      <div className="space-y-16">
+      <hr className="workspace-divider" />
+
+      {/* 02. The Deep Review */}
+      <div className="space-y-32">
         <Question
           number="01"
-          label="What did you build today?"
+          label="What did you actually build?"
           value={did}
           onChange={setDid}
-          placeholder="Actions taken toward the mission..."
-          required
+          placeholder="Truthful account of the day..."
         />
         <Question
           number="02"
           label="What blocked your focus?"
           value={blocked}
           onChange={setBlocked}
-          placeholder="Identify the friction..."
+          placeholder="Identify the escape doors..."
         />
         <Question
           number="03"
           label="What changes tomorrow?"
           value={tomorrow}
           onChange={setTomorrow}
-          placeholder="System adjustments..."
+          placeholder="Systemic adjustment..."
         />
       </div>
 
-      {/* 03. Action */}
-      <div className="pt-12 flex justify-center">
+      {/* Action */}
+      <div className="pt-24 flex justify-center">
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="text-[10px] font-mono bg-primary text-primary-foreground px-12 py-4 rounded-full uppercase tracking-[0.3em] font-bold disabled:opacity-20 hover:opacity-90 transition-all shadow-lg shadow-primary/20 active:scale-95"
+          className="bg-primary text-primary-foreground px-16 py-5 rounded-full text-xs font-mono uppercase tracking-[0.4em] font-bold shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 disabled:opacity-10 transition-all"
         >
           Close the Day
         </button>
@@ -121,19 +131,18 @@ export function ReflectionScreen() {
 }
 
 function Question({
-  number, label, value, onChange, placeholder, required,
+  number, label, value, onChange, placeholder,
 }: {
   number: string
   label: string
   value: string
   onChange: (v: string) => void
   placeholder: string
-  required?: boolean
 }) {
   return (
-    <div className="space-y-6 group">
-      <div className="flex items-baseline gap-4">
-        <span className="text-[10px] font-mono text-muted-foreground/30 font-bold">{number}</span>
+    <div className="space-y-12">
+      <div className="flex items-baseline gap-6">
+        <span className="text-xs font-mono text-muted-foreground/30 font-bold">{number}</span>
         <label className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
           {label}
         </label>
@@ -143,17 +152,8 @@ function Question({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={2}
-        className="w-full bg-transparent text-xl md:text-2xl text-foreground font-light placeholder:text-muted-foreground/20 outline-none resize-none leading-relaxed transition-colors focus:text-primary/80"
+        className="w-full bg-transparent text-3xl md:text-4xl text-foreground font-light placeholder:text-muted-foreground/10 outline-none resize-none leading-tight focus:text-primary transition-colors"
       />
-    </div>
-  )
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{label}</p>
-      <p className="text-2xl font-light text-foreground">{value}</p>
     </div>
   )
 }

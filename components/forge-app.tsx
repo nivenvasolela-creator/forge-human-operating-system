@@ -12,6 +12,7 @@ import { ReflectionScreen } from "@/components/screens/reflection"
 import { MetricsScreen } from "@/components/screens/metrics"
 import { ProfileScreen } from "@/components/screens/profile"
 import { FocusScreen } from "@/components/screens/focus"
+import { cn } from "@/lib/utils"
 
 export function ForgeApp() {
   const { loading, user } = useAuth()
@@ -82,8 +83,8 @@ export function ForgeApp() {
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/10">
-      <ForgeNav />
-      <main className="pb-32 md:pb-40">
+      {currentScreen !== "focus" && <ForgeNav />}
+      <main className={cn("pb-40", currentScreen === "focus" && "pb-0 pt-0")}>
         {currentScreen === "today" && <TodayScreen />}
         {currentScreen === "blueprint" && <BlueprintScreen />}
         {currentScreen === "focus" && <FocusScreen />}

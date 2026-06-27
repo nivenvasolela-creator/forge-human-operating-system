@@ -66,7 +66,7 @@ Deno.serve(async (req: Request) => {
     }
 
     // Extract goals and identity from mind dump
-    const extractionPrompt = `Analyze this mind dump and extract structured information. The user has written freely about their dreams, fears, goals, and frustrations.
+    const extractionPrompt = `Analyze this mind dump and extract structured information for a Human Operating System called FORGE. The user has written freely about their dreams, fears, goals, and frustrations.
 
 Mind dump:
 """
@@ -75,9 +75,11 @@ ${mind_dump}
 
 Extract and return ONLY a JSON object with these fields:
 {
-  "destination": "A single clear statement of who they want to become (1-2 sentences)"
+  "destination": "A single clear statement of who they want to become (e.g. 'I am an AI Founder building the future of work')"
   "current_reality": "An honest assessment of where they are now (1-2 sentences)"
   "gap": "The key things that need to change to bridge the gap (2-3 sentences)"
+  "principles": ["3-5 core principles extracted from their values"],
+  "standards": ["3-5 non-negotiable rules/standards they must live by"],
   "milestones": [
     {"label": "First milestone (30 days)", "timeframe": "30 days"},
     {"label": "Second milestone (90 days)", "timeframe": "90 days"},
@@ -90,14 +92,13 @@ Extract and return ONLY a JSON object with these fields:
 Be specific and actionable. Use their own words where possible.`
 
     const extraction = await callGroq(groqApiKey, [
-      { role: "system", content: "You are an expert at extracting structured goals from unstructured writing. Return only valid JSON." },
+      { role: "system", content: "You are the Forge Identity Engine. You extract clear identity and strategy from raw thoughts. Return only valid JSON." },
       { role: "user", content: extractionPrompt },
     ])
 
     // Parse the extraction
     let blueprint
     try {
-      // Extract JSON from the response (handle potential markdown wrapping)
       const jsonMatch = extraction.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
         blueprint = JSON.parse(jsonMatch[0])
@@ -130,6 +131,8 @@ Be specific and actionable. Use their own words where possible.`
           destination: blueprint.destination,
           current_reality: blueprint.current_reality,
           gap: blueprint.gap,
+          principles: blueprint.principles,
+          standards: blueprint.standards,
           updated_at: new Date().toISOString(),
         }),
       })
@@ -169,10 +172,10 @@ Be specific and actionable. Use their own words where possible.`
         },
         body: JSON.stringify({
           user_id,
-          insight_text: "Your blueprint is ready. Review it and adjust anything that doesn't feel right.",
+          insight_text: "Identity forged. Your blueprint is now active. Review your standards.",
           insight_type: "immediate",
           category: "breakthrough",
-          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
+          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         }),
       })
     }

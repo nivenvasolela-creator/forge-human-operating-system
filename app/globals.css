@@ -105,7 +105,6 @@
   --accent: #F97316;
   --accent-foreground: #FFFFFF;
 
-  --destructive: #DC2626;
   --border: #2D313A;
   --input: #2D313A;
   --ring: #F97316;
@@ -132,12 +131,34 @@
     -webkit-text-size-adjust: 100%;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans tracking-tight font-medium;
+    @apply font-sans tracking-tight font-semibold;
   }
 
   button, a, input, textarea {
     @apply touch-manipulation;
   }
+}
+
+/* Typography Scale */
+.title-huge {
+  @apply text-[34px] md:text-[42px] leading-tight tracking-tight;
+}
+
+.title-section {
+  @apply text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em] font-bold;
+}
+
+/* Layout Utilities */
+.workspace-container {
+  @apply max-w-xl mx-auto py-16 md:py-32 px-8 md:px-0 space-y-24 animate-in fade-in duration-1000;
+}
+
+.workspace-section {
+  @apply space-y-12;
+}
+
+.workspace-divider {
+  @apply border-foreground/5 my-24;
 }
 
 /* FORGE custom scrollbar */
@@ -154,28 +175,10 @@
   @apply bg-primary/20;
 }
 
-/* Shadows */
-.forge-card-shadow {
-  box-shadow: 0 2px 12px -1px rgb(0 0 0 / 0.03), 0 1px 4px -2px rgb(0 0 0 / 0.02);
-}
-
-.dark .forge-card-shadow {
-  box-shadow: 0 10px 30px -4px rgb(0 0 0 / 0.3);
-}
-
-@keyframes pulse-forge {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-.workspace-border {
-  @apply border-y border-foreground/5 py-12;
 }

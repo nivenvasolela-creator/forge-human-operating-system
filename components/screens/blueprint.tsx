@@ -6,11 +6,12 @@ import { cn } from "@/lib/utils"
 
 export function BlueprintScreen() {
   const {
-    mindDump,
     destination,
     currentReality,
     gap,
     milestones,
+    principles,
+    standards,
     setBlueprint,
     toggleMilestone,
     setScreen,
@@ -33,22 +34,22 @@ export function BlueprintScreen() {
   }
 
   return (
-    <div className="max-w-xl mx-auto py-12 md:py-24 px-8 md:px-0 space-y-24 animate-in fade-in duration-700">
+    <div className="workspace-container">
 
       {/* 01. Vision Header */}
       <div className="space-y-6">
-        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em] font-bold">
-          The Living Roadmap
-        </p>
-        <h1 className="text-3xl md:text-4xl text-foreground font-medium tracking-tight leading-tight">
+        <p className="title-section">The Living Roadmap</p>
+        <h1 className="title-huge font-light text-foreground">
           Your path is being forged.
         </h1>
-        <p className="text-lg text-muted-foreground font-light leading-relaxed">
+        <p className="text-xl text-muted-foreground font-light leading-relaxed">
           The blueprint is a document of intent. It evolves as you do.
         </p>
       </div>
 
-      {/* 02. Blueprint Content */}
+      <hr className="workspace-divider" />
+
+      {/* 02. Core Identity */}
       <div className="space-y-16">
         {!editing && hasBlueprint ? (
           <div className="space-y-16">
@@ -67,6 +68,13 @@ export function BlueprintScreen() {
               content={gap}
               empty="Name the specific things that need to change."
             />
+
+            {/* Principles & Standards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+              <ListSection label="Principles" items={principles} />
+              <ListSection label="Standards" items={standards} />
+            </div>
+
             <button
               onClick={() => {
                 setDest(destination)
@@ -76,7 +84,7 @@ export function BlueprintScreen() {
               }}
               className="text-[10px] font-mono text-muted-foreground hover:text-foreground uppercase tracking-widest transition-colors"
             >
-              Adjust Blueprint &rarr;
+              Adjust Identity &rarr;
             </button>
           </div>
         ) : (
@@ -120,12 +128,12 @@ export function BlueprintScreen() {
         )}
       </div>
 
+      <hr className="workspace-divider" />
+
       {/* 03. Roadmap */}
       <div className="space-y-12">
         <div className="flex items-end justify-between">
-          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em] font-bold">
-            Roadmap
-          </p>
+          <p className="title-section">Milestones</p>
           <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-widest">
             {doneMilestones}/{milestones.length} milestones &bull; {progress}%
           </p>
@@ -161,16 +169,6 @@ export function BlueprintScreen() {
         </div>
       </div>
 
-      {/* 04. CTA */}
-      <div className="pt-12 flex justify-center">
-        <button
-          onClick={() => setScreen("today")}
-          className="text-[10px] font-mono text-muted-foreground hover:text-foreground uppercase tracking-[0.4em] font-bold transition-colors"
-        >
-          Return to Focus &rarr;
-        </button>
-      </div>
-
     </div>
   )
 }
@@ -178,7 +176,7 @@ export function BlueprintScreen() {
 function Section({ label, content, empty }: { label: string; content: string; empty: string }) {
   return (
     <div className="space-y-4">
-      <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] font-bold">{label}</p>
+      <p className="title-section">{label}</p>
       <p className={cn(
         "text-xl md:text-2xl leading-relaxed font-light",
         content ? "text-foreground/90" : "text-muted-foreground/30 italic"
@@ -189,10 +187,28 @@ function Section({ label, content, empty }: { label: string; content: string; em
   )
 }
 
+function ListSection({ label, items }: { label: string; items: string[] }) {
+  return (
+    <div className="space-y-6">
+      <p className="title-section">{label}</p>
+      <ul className="space-y-4">
+        {items.length > 0 ? items.map((item, i) => (
+          <li key={i} className="text-base text-foreground/80 font-light flex gap-4">
+            <span className="text-primary/40 text-xs font-mono pt-1">&bull;</span>
+            <span>{item}</span>
+          </li>
+        )) : (
+          <li className="text-sm text-muted-foreground/30 italic">Calibrating...</li>
+        )}
+      </ul>
+    </div>
+  )
+}
+
 function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
     <div className="space-y-4">
-      <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] font-bold">{label}</p>
+      <p className="title-section">{label}</p>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
