@@ -4,15 +4,19 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 import { useForgeStore } from "@/lib/forge-store"
-import { MorningView } from "@/components/views/morning"
-import { FocusView } from "@/components/views/focus"
-import { EveningView } from "@/components/views/evening"
-import { BetweenView } from "@/components/views/between"
+import { ForgeNav } from "@/components/forge-nav"
 import { OnboardingView } from "@/components/views/onboarding"
+import { BlueprintScreen } from "@/components/screens/blueprint"
+import { TodayScreen } from "@/components/screens/today"
+import { ReflectionScreen } from "@/components/screens/reflection"
+import { MetricsScreen } from "@/components/screens/metrics"
+import { ProfileScreen } from "@/components/screens/profile"
+import { FocusView } from "@/components/views/focus"
+import { cn } from "@/lib/utils"
 
 export function ForgeApp() {
   const { loading, user } = useAuth()
-  const { currentState, hydrate, onboardingComplete } = useForgeStore()
+  const { currentState, currentScreen, hydrate, onboardingComplete } = useForgeStore()
   const router = useRouter()
 
   useEffect(() => {
@@ -27,25 +31,40 @@ export function ForgeApp() {
     }
   }, [loading, user, router])
 
-  if (loading || (user && currentState === "onboarding" && onboardingComplete)) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="os-label animate-pulse">Initializing FORGE...</div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <div className="os-label animate-pulse font-bold">Authenticating...</div>
+        </div>
       </div>
     )
   }
 
   if (!user) return null
 
+  // Mandatory Onboarding Flow
+  if (!onboardingComplete) {
+    return <OnboardingView />
+  }
+
+  // Focus Mode silences everything
+  if (currentState === "focus") {
+    return <FocusView />
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/10">
-      <main className="max-w-xl mx-auto px-8 md:px-0">
-        {currentState === "onboarding" && <OnboardingView />}
-        {currentState === "morning" && <MorningView />}
-        {currentState === "focus" && <FocusView />}
-        {currentState === "between" && <BetweenView />}
-        {currentState === "evening" && <EveningView />}
+      <main className="pb-32 md:pb-40">
+        {currentScreen === "today" && <TodayScreen />}
+        {currentScreen === "blueprint" && <BlueprintScreen />}
+        {currentScreen === "focus" && <FocusView />}
+        {currentScreen === "metrics" && <MetricsScreen />}
+        {currentScreen === "profile" && <ProfileScreen />}
+        {currentScreen === "reflection" && <ReflectionScreen />}
       </main>
+      <ForgeNav />
     </div>
   )
 }

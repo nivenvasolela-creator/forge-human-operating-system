@@ -12,7 +12,7 @@ export function TodayScreen() {
     setDailyMission,
     optimalTaskCount,
     toggleTask,
-    setScreen,
+    startSession,
   } = useForgeStore()
 
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -31,6 +31,12 @@ export function TodayScreen() {
       setDailyMission(missionInput.trim())
       setIsEditingMission(false)
     }
+  }
+
+  const handleBeginFocus = () => {
+    // Default to the mission as the session goal if tasks are empty
+    const sessionGoal = activeTasks[0]?.text || dailyMission || "Execution Session"
+    startSession(sessionGoal, "building")
   }
 
   const greeting = () => {
@@ -80,7 +86,7 @@ export function TodayScreen() {
         ) : (
           <div className="group cursor-pointer" onClick={() => setIsEditingMission(true)}>
             <p className="text-2xl md:text-3xl text-foreground font-light leading-relaxed group-hover:text-primary transition-all duration-500">
-              {dailyMission}
+              {dailyMission || "Define your mission..."}
             </p>
           </div>
         )}
@@ -121,7 +127,7 @@ export function TodayScreen() {
       {/* 04. Singular Action */}
       <div className="pt-12 flex justify-center">
         <button
-          onClick={() => setScreen("focus")}
+          onClick={handleBeginFocus}
           className="bg-primary text-primary-foreground px-16 py-6 rounded-full text-xs font-mono uppercase tracking-[0.4em] font-bold shadow-2xl shadow-primary/30 hover:scale-[1.05] active:scale-95 transition-all duration-500"
         >
           Begin Focus
