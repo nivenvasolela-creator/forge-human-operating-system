@@ -46,76 +46,38 @@
 :root {
   color-scheme: light;
 
-  --background: #F2F1ED; /* Warm Stone - More grounded, less 'blinding' white */
-  --foreground: #0F172A; /* Ink Blue/Black - High contrast readability */
+  --background: #F2F1ED; /* Warm Paper */
+  --foreground: #0A0A0A; /* Ink Black */
 
-  --card: #FAF9F6; /* Ivory Surface - Distinct from background */
-  --card-foreground: #0F172A;
+  --card: #FAF9F6;
+  --card-foreground: #0A0A0A;
 
   --popover: #FAF9F6;
-  --popover-foreground: #0F172A;
+  --popover-foreground: #0A0A0A;
 
-  /* Primary = Forge Orange */
-  --primary: #F97316;
+  --primary: #F97316; /* Forge Orange */
   --primary-foreground: #FFFFFF;
 
-  /* Secondary = Deep Steel */
   --secondary: #475569;
   --secondary-foreground: #F8FAFC;
 
   --muted: #E5E7EB;
-  --muted-foreground: #64748B; /* Darker grey for better visibility */
+  --muted-foreground: #64748B;
 
   --accent: #F97316;
   --accent-foreground: #FFFFFF;
 
   --destructive: #DC2626;
-  --border: #D1D5DB; /* Darker border for structure */
+  --border: #D1D5DB;
   --input: #D1D5DB;
   --ring: #F97316;
 
   --radius: 2rem;
 
-  /* FORGE brand */
   --forge: #F97316;
   --forge-dim: #EA580C;
   --forge-muted: #475569;
   --surface: #FAF9F6;
-}
-
-.dark {
-  color-scheme: dark;
-
-  --background: #0F172A; /* Deep Space */
-  --foreground: #F8FAFC;
-
-  --card: #1E293B; /* Slate Surface */
-  --card-foreground: #F8FAFC;
-
-  --popover: #1E293B;
-  --popover-foreground: #F8FAFC;
-
-  --primary: #F97316;
-  --primary-foreground: #FFFFFF;
-
-  --secondary: #475569;
-  --secondary-foreground: #F8FAFC;
-
-  --muted: #1E293B;
-  --muted-foreground: #94A3B8;
-
-  --accent: #F97316;
-  --accent-foreground: #FFFFFF;
-
-  --destructive: #DC2626;
-  --border: #334155;
-  --input: #334155;
-  --ring: #F97316;
-
-  --forge: #F97316;
-  --forge-dim: #EA580C;
-  --forge-muted: #64748B;
-  --surface: #1E293B;
 }
 
 @layer base {
@@ -134,7 +96,7 @@
     -webkit-text-size-adjust: 100%;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans tracking-tight font-semibold;
+    @apply font-sans tracking-tighter font-semibold;
   }
 
   button, a, input, textarea {
@@ -142,46 +104,24 @@
   }
 }
 
-/* Typography Scale */
-.title-huge {
-  @apply text-[34px] md:text-[42px] leading-tight tracking-tight;
+/* Systemic Hierarchy */
+.os-title {
+  @apply text-[40px] md:text-[56px] leading-[0.95] tracking-tighter font-medium;
 }
 
-.title-section {
-  @apply text-[10px] font-mono text-muted-foreground uppercase tracking-[0.3em] font-bold;
+.os-label {
+  @apply text-[10px] font-mono text-muted-foreground uppercase tracking-[0.4em] font-bold;
 }
 
-/* Layout Utilities */
-.workspace-container {
-  @apply max-w-xl mx-auto py-16 md:py-32 px-8 md:px-0 space-y-24 animate-in fade-in duration-1000;
-}
-
-.workspace-section {
-  @apply space-y-12;
-}
-
-.workspace-divider {
+.os-divider {
   @apply border-foreground/5 my-24;
 }
 
-/* FORGE custom scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/10 rounded-full;
-}
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary/20;
+.os-card {
+  @apply bg-card rounded-[2.5rem] border border-border/40 p-12 shadow-2xl shadow-foreground/5 animate-in fade-in zoom-in duration-700;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Transitions */
+.view-transition-enter {
+  @apply animate-in fade-in slide-in-from-bottom-4 duration-1000;
 }

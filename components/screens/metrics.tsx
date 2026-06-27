@@ -1,97 +1,64 @@
 "use client"
 
 import { useForgeStore } from "@/lib/forge-store"
-import { cn } from "@/lib/utils"
 
 export function MetricsScreen() {
-  const {
-    streakDays,
-    totalDeepWorkHours,
-    reflections,
-    patterns,
-  } = useForgeStore()
+  const { shipRate, metaTaxRatio, dailyLogs } = useForgeStore()
 
-  const taskRate = patterns.find(p => p.type === 'task_completion_rate')?.data?.rate || 0
-  const dwConsistency = patterns.find(p => p.type === 'deep_work_consistency')?.data?.rate || 0
-  const optimalHours = patterns.find(p => p.type === 'optimal_hours')?.data || []
+  const totalDays = Object.keys(dailyLogs).length
+  const totalSessions = Object.values(dailyLogs).flatMap(l => l.sessions).length
 
   return (
-    <div className="workspace-container">
+    <div className="py-24 space-y-24 animate-in fade-in duration-1000">
 
-      {/* Review Header */}
       <div className="space-y-6">
-        <p className="title-section text-primary">System Review</p>
-        <h1 className="title-huge font-light text-foreground">
-          The algorithm is observing.
-        </h1>
-        <p className="text-xl text-muted-foreground font-light leading-relaxed font-medium">
-          Patterns emerge from action. Silence reveals the truth of your execution.
+        <p className="os-label tracking-[0.4em]">Review Engine</p>
+        <h1 className="os-title">System Analysis.</h1>
+        <p className="text-xl text-muted-foreground font-light leading-relaxed">
+          The truth of your execution, visualized without the noise.
         </p>
       </div>
 
-      <hr className="workspace-divider" />
+      <hr className="border-foreground/5" />
 
-      {/* Primary Insights */}
-      <div className="workspace-section">
-        <p className="title-section">Execution Insight</p>
-        <div className="space-y-24">
-          <div className="space-y-4">
-            <p className="text-3xl md:text-4xl font-light text-foreground leading-tight">
-              You have maintained a <span className="text-primary font-bold">{streakDays} day</span> momentum.
-            </p>
-            <p className="text-xl text-muted-foreground font-medium">
-              {totalDeepWorkHours.toFixed(1)} hours of deep focus have been forged in total.
-            </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
+        <div className="space-y-4">
+          <p className="os-label">Execution (30d)</p>
+          <p className="text-6xl font-mono tracking-tighter text-primary font-bold">
+            {Math.round(shipRate * 100)}%
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            The percentage of days where you shipped real output for ALERA.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <p className="os-label">Cognitive Tax</p>
+          <p className="text-6xl font-mono tracking-tighter text-foreground/80">
+            {Math.round(metaTaxRatio * 100)}%
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            The ratio of planning and design sessions vs. actual building.
+          </p>
+        </div>
+      </div>
+
+      <hr className="border-foreground/5" />
+
+      <div className="space-y-12">
+        <p className="os-label">Execution Volume</p>
+        <div className="grid grid-cols-2 gap-12">
+          <div className="space-y-2">
+            <p className="text-3xl font-light">{totalDays}</p>
+            <p className="os-label !text-[8px] opacity-50 uppercase tracking-widest">Days Active</p>
           </div>
-
-          <div className="space-y-16">
-            <ReviewItem
-              title="Peak Performance"
-              content={optimalHours.length > 0
-                ? `You consistently work best between ${Math.min(...optimalHours)}:00 and ${Math.max(...optimalHours) + 1}:00.`
-                : "The system is still calibrating your peak performance window."
-              }
-            />
-            <ReviewItem
-              title="Focus Consistency"
-              content={`You reach your deep work targets ${Math.round(dwConsistency * 100)}% of the time. The system adapts to your current capacity.`}
-            />
-            <ReviewItem
-              title="Task Load"
-              content={`With a completion rate of ${Math.round(taskRate * 100)}%, your daily system has been adjusted for optimal execution.`}
-            />
+          <div className="space-y-2">
+            <p className="text-3xl font-light">{totalSessions}</p>
+            <p className="os-label !text-[8px] opacity-50 uppercase tracking-widest">Total Sessions</p>
           </div>
         </div>
       </div>
 
-      <hr className="workspace-divider" />
-
-      {/* Subtle Data */}
-      <div className="grid grid-cols-2 gap-y-16">
-        <Stat label="Total Reflections" value={reflections.length} />
-        <Stat label="Avg. Focus" value={`${(totalDeepWorkHours / (reflections.length || 1)).toFixed(1)}h/d`} />
-      </div>
-
-    </div>
-  )
-}
-
-function ReviewItem({ title, content }: { title: string; content: string }) {
-  return (
-    <div className="space-y-4 max-w-lg">
-      <p className="title-section opacity-50">{title}</p>
-      <p className="text-2xl font-light text-foreground/80 leading-relaxed">
-        {content}
-      </p>
-    </div>
-  )
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="space-y-2">
-      <p className="title-section">{label}</p>
-      <p className="text-3xl font-light text-foreground">{value}</p>
     </div>
   )
 }
