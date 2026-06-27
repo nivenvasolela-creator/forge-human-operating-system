@@ -4,6 +4,9 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 const app = new Hono();
+
+app.get("/", (c) => c.text("Forge Remote Controller (MCP) is live."));
+
 const server = new McpServer({
   name: "Forge Remote Controller",
   version: "1.1.0",
