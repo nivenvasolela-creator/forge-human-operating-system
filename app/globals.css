@@ -46,30 +46,32 @@
 :root {
   color-scheme: light;
 
-  --background: #F7F7F5;
-  --foreground: #111827;
+  --background: #F2F1ED; /* Warm Stone - More grounded, less 'blinding' white */
+  --foreground: #0F172A; /* Ink Blue/Black - High contrast readability */
 
-  --card: #FFFFFF;
-  --card-foreground: #111827;
+  --card: #FAF9F6; /* Ivory Surface - Distinct from background */
+  --card-foreground: #0F172A;
 
-  --popover: #FFFFFF;
-  --popover-foreground: #111827;
+  --popover: #FAF9F6;
+  --popover-foreground: #0F172A;
 
+  /* Primary = Forge Orange */
   --primary: #F97316;
   --primary-foreground: #FFFFFF;
 
-  --secondary: #6B7280;
-  --secondary-foreground: #F9FAFB;
+  /* Secondary = Deep Steel */
+  --secondary: #475569;
+  --secondary-foreground: #F8FAFC;
 
-  --muted: #F3F4F6;
-  --muted-foreground: #9CA3AF;
+  --muted: #E5E7EB;
+  --muted-foreground: #64748B; /* Darker grey for better visibility */
 
   --accent: #F97316;
   --accent-foreground: #FFFFFF;
 
   --destructive: #DC2626;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
+  --border: #D1D5DB; /* Darker border for structure */
+  --input: #D1D5DB;
   --ring: #F97316;
 
   --radius: 2rem;
@@ -77,42 +79,43 @@
   /* FORGE brand */
   --forge: #F97316;
   --forge-dim: #EA580C;
-  --forge-muted: #6B7280;
-  --surface: #FFFFFF;
+  --forge-muted: #475569;
+  --surface: #FAF9F6;
 }
 
 .dark {
   color-scheme: dark;
 
-  --background: #16181D;
+  --background: #0F172A; /* Deep Space */
   --foreground: #F8FAFC;
 
-  --card: #1E2128;
+  --card: #1E293B; /* Slate Surface */
   --card-foreground: #F8FAFC;
 
-  --popover: #1E2128;
+  --popover: #1E293B;
   --popover-foreground: #F8FAFC;
 
   --primary: #F97316;
   --primary-foreground: #FFFFFF;
 
-  --secondary: #4B5563;
+  --secondary: #475569;
   --secondary-foreground: #F8FAFC;
 
-  --muted: #272A33;
-  --muted-foreground: #9CA3AF;
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
 
   --accent: #F97316;
   --accent-foreground: #FFFFFF;
 
-  --border: #2D313A;
-  --input: #2D313A;
+  --destructive: #DC2626;
+  --border: #334155;
+  --input: #334155;
   --ring: #F97316;
 
   --forge: #F97316;
   --forge-dim: #EA580C;
-  --forge-muted: #4B5563;
-  --surface: #1E2128;
+  --forge-muted: #64748B;
+  --surface: #1E293B;
 }
 
 @layer base {

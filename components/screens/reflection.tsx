@@ -69,20 +69,20 @@ export function ReflectionScreen() {
           </h1>
         </div>
 
-        <div className="space-y-8 p-12 bg-card rounded-[3rem] border border-foreground/5 shadow-2xl shadow-foreground/5">
+        <div className="space-y-8 p-12 bg-card rounded-[3rem] border border-border shadow-2xl shadow-foreground/5 animate-in zoom-in duration-500">
           <div className="space-y-2">
-            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Today&apos;s Mission</p>
-            <p className="text-xl text-foreground font-light">{dailyMission || "No mission defined."}</p>
+            <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest font-bold">Today&apos;s Mission</p>
+            <p className="text-xl text-foreground font-medium">{dailyMission || "No mission defined."}</p>
           </div>
 
           <div className="flex justify-between items-end">
             <div className="space-y-2">
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Execution</p>
-              <p className="text-3xl font-mono text-primary font-bold">{executionRate}%</p>
+              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest font-bold">Execution</p>
+              <p className="text-4xl font-mono text-primary font-bold tracking-tighter">{executionRate}%</p>
             </div>
             <div className="text-right space-y-1">
-              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Gap</p>
-              <p className="text-sm text-foreground/60">{completedToday} of {plannedCount} actions completed</p>
+              <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest font-bold">Gap</p>
+              <p className="text-sm text-foreground/80 font-medium">{completedToday} of {plannedCount} actions completed</p>
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@ export function ReflectionScreen() {
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="bg-primary text-primary-foreground px-16 py-5 rounded-full text-xs font-mono uppercase tracking-[0.4em] font-bold shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 disabled:opacity-10 transition-all"
+          className="bg-primary text-primary-foreground px-16 py-6 rounded-full text-xs font-mono uppercase tracking-[0.4em] font-bold shadow-2xl shadow-primary/30 hover:scale-[1.05] active:scale-95 disabled:opacity-20 transition-all duration-500"
         >
           Close the Day
         </button>

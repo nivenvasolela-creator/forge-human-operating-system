@@ -38,7 +38,7 @@ export function ForgeApp() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] animate-pulse">
+          <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] animate-pulse font-bold">
             Authenticating...
           </div>
         </div>
@@ -50,12 +50,12 @@ export function ForgeApp() {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
         <div className="space-y-6">
-          <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em]">
+          <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] font-bold">
             Secure session not found.
           </div>
           <button
             onClick={() => router.push("/login")}
-            className="text-xs font-mono text-primary border border-primary/20 px-6 py-3 rounded-lg hover:bg-primary/5 transition-all"
+            className="text-xs font-mono text-primary border border-primary/40 px-8 py-4 rounded-full hover:bg-primary/5 transition-all font-bold tracking-widest"
           >
             Sign in to Forge &rarr;
           </button>
@@ -69,7 +69,7 @@ export function ForgeApp() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] animate-pulse">
+          <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] animate-pulse font-bold">
             Syncing your system...
           </div>
         </div>

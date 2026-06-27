@@ -20,11 +20,11 @@ export function MetricsScreen() {
 
       {/* Review Header */}
       <div className="space-y-6">
-        <p className="title-section">System Review</p>
+        <p className="title-section text-primary">System Review</p>
         <h1 className="title-huge font-light text-foreground">
           The algorithm is observing.
         </h1>
-        <p className="text-xl text-muted-foreground font-light leading-relaxed">
+        <p className="text-xl text-muted-foreground font-light leading-relaxed font-medium">
           Patterns emerge from action. Silence reveals the truth of your execution.
         </p>
       </div>
@@ -37,9 +37,9 @@ export function MetricsScreen() {
         <div className="space-y-24">
           <div className="space-y-4">
             <p className="text-3xl md:text-4xl font-light text-foreground leading-tight">
-              You have maintained a <span className="text-primary font-semibold">{streakDays} day</span> momentum.
+              You have maintained a <span className="text-primary font-bold">{streakDays} day</span> momentum.
             </p>
-            <p className="text-xl text-muted-foreground font-light">
+            <p className="text-xl text-muted-foreground font-medium">
               {totalDeepWorkHours.toFixed(1)} hours of deep focus have been forged in total.
             </p>
           </div>

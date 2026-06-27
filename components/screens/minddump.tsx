@@ -21,13 +21,13 @@ export function MindDumpScreen() {
   if (step === "processing") {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-12 text-center space-y-16">
-        <ForgeLogo className="w-24 h-24 animate-pulse opacity-50" />
+        <ForgeLogo className="w-24 h-24 animate-pulse opacity-80" />
         <div className="space-y-6">
-          <p className="title-section">Initializing OS</p>
+          <p className="title-section text-primary">Initializing OS</p>
           <h1 className="title-huge font-light text-foreground">
             Forging your blueprint.
           </h1>
-          <p className="text-xl text-muted-foreground font-light max-w-sm mx-auto leading-relaxed">
+          <p className="text-xl text-muted-foreground font-light max-w-sm mx-auto leading-relaxed font-medium">
             The system is aligning your mission with your intentions.
           </p>
         </div>

@@ -49,10 +49,10 @@ export function BlueprintScreen() {
 
       <hr className="workspace-divider" />
 
-      {/* 02. Core Identity */}
+      {/* 02. Blueprint Content */}
       <div className="space-y-16">
         {!editing && hasBlueprint ? (
-          <div className="space-y-16">
+          <div className="space-y-24">
             <Section
               label="Destination"
               content={destination}
@@ -82,13 +82,13 @@ export function BlueprintScreen() {
                 setGapText(gap)
                 setEditing(true)
               }}
-              className="text-[10px] font-mono text-muted-foreground hover:text-foreground uppercase tracking-widest transition-colors"
+              className="text-[10px] font-mono text-muted-foreground hover:text-foreground uppercase tracking-widest transition-all font-bold border-b border-transparent hover:border-foreground/20 pb-1 w-fit"
             >
               Adjust Identity &rarr;
             </button>
           </div>
         ) : (
-          <div className="space-y-12 bg-card p-8 md:p-12 rounded-[2.5rem] border border-foreground/5 shadow-2xl shadow-foreground/5">
+          <div className="space-y-12 bg-card p-8 md:p-12 rounded-[2.5rem] border border-border shadow-2xl shadow-foreground/5 animate-in slide-in-from-bottom-4 duration-500">
             <Field
               label="Destination"
               value={dest}
@@ -111,14 +111,14 @@ export function BlueprintScreen() {
               <button
                 onClick={save}
                 disabled={!dest.trim()}
-                className="text-[10px] font-mono bg-primary text-primary-foreground px-8 py-3 rounded-full uppercase tracking-[0.2em] font-bold disabled:opacity-20 hover:opacity-90 transition-all"
+                className="text-[10px] font-mono bg-primary text-primary-foreground px-10 py-4 rounded-full uppercase tracking-widest font-bold disabled:opacity-20 hover:scale-[1.05] active:scale-95 transition-all duration-300"
               >
                 Save
               </button>
               {hasBlueprint && (
                 <button
                   onClick={() => setEditing(false)}
-                  className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] font-bold hover:text-foreground transition-colors px-4"
+                  className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest font-bold hover:text-foreground transition-colors px-4"
                 >
                   Cancel
                 </button>
@@ -134,35 +134,37 @@ export function BlueprintScreen() {
       <div className="space-y-12">
         <div className="flex items-end justify-between">
           <p className="title-section">Milestones</p>
-          <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-widest">
+          <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-widest font-bold">
             {doneMilestones}/{milestones.length} milestones &bull; {progress}%
           </p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-4">
           {milestones.map((m, i) => (
             <button
               key={m.id}
               onClick={() => toggleMilestone(m.id)}
-              className="w-full flex items-start gap-8 py-6 group text-left transition-all hover:translate-x-1"
+              className="w-full flex items-start gap-8 py-8 px-8 group text-left transition-all hover:bg-card hover:shadow-xl hover:shadow-foreground/5 rounded-[2rem] border border-transparent hover:border-border"
             >
-              <span className="text-[10px] font-mono text-muted-foreground/20 w-4 shrink-0 font-bold pt-1">{String(i + 1).padStart(2, '0')}</span>
-              <div className="flex-1 space-y-2">
+              <span className="text-[10px] font-mono text-muted-foreground/30 font-bold pt-1.5">{String(i + 1).padStart(2, '0')}</span>
+              <div className="flex-1 space-y-3">
                 <span
                   className={cn(
-                    "text-lg transition-colors block leading-snug",
-                    m.done ? "line-through text-muted-foreground/40 font-light" : "text-foreground/90 font-light"
+                    "text-xl md:text-2xl transition-all duration-500 block leading-snug",
+                    m.done ? "line-through text-muted-foreground/40 font-light" : "text-foreground font-light group-hover:text-primary"
                   )}
                 >
                   {m.label}
                 </span>
-                <span className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] block">{m.timeframe}</span>
+                <span className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] block font-bold">
+                  {m.timeframe}
+                </span>
               </div>
               <div className={cn(
-                "w-5 h-5 rounded-full border border-foreground/5 mt-1 flex items-center justify-center shrink-0 transition-all",
-                m.done ? "bg-primary border-primary" : "group-hover:border-primary/20"
+                "w-6 h-6 rounded-full border border-border mt-1.5 flex items-center justify-center shrink-0 transition-all duration-500",
+                m.done ? "bg-primary border-primary shadow-lg shadow-primary/20" : "group-hover:border-primary/40"
               )}>
-                {m.done && <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
+                {m.done && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
               </div>
             </button>
           ))}
